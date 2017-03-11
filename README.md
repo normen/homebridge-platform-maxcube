@@ -16,7 +16,7 @@ Bridges the Eq3 MaxCube box to homekit
         "platform": "MaxCubePlatform",
         "name": "MaxCube Platform",
         "ip": "192.168.2.20",
-				"port": 62910
+        "port": 62910
       }
   ]
 }
