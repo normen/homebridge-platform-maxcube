@@ -1,0 +1,37 @@
+{
+  "name": "homebridge-platform-maxcube",
+  "version": "0.0.1",
+  "description": "EQ-3 Bluetooth Thermostat plugin for Homebridge",
+  "author": "Tobias Schlottke",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/macnow/homebridge-platform-eq3btsmart.git"
+  },
+  "scripts": {
+   },
+  "bugs": {
+    "url": "https://github.com/macnow/homebridge-platform-eq3btsmart/issues",
+    "email": "macnow@gmail.com"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "homebridge",
+    "eq-3",
+    "eq3",
+    "bluetooth",
+    "thermostat",
+    "home",
+    "heating"
+  ],
+  "engines": {
+    "node": ">=4.4.0",
+    "homebridge": ">=0.3.0"
+  },
+  "dependencies": {
+    "maxcube": "^1.0.6"
+  },
+  "devDependencies": {
+    "homebridge": "0.4.8"
+  }
+}

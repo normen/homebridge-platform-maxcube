@@ -1,0 +1,1 @@
+# maxcube module for homebridge
