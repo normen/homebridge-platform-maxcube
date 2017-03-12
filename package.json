@@ -1,7 +1,7 @@
 {
   "name": "homebridge-platform-maxcube",
   "version": "0.0.1",
-  "description": "EQ-3 Bluetooth Thermostat plugin for Homebridge",
+  "description": "EQ-3 MaxCube plugin for Homebridge",
   "author": "Tobias Schlottke",
   "license": "MIT",
   "repository": {
@@ -19,7 +19,7 @@
     "homebridge",
     "eq-3",
     "eq3",
-    "bluetooth",
+    "maxcube",
     "thermostat",
     "home",
     "heating"
