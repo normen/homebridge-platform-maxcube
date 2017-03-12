@@ -10,8 +10,8 @@ function MaxCubePlatform(log, config){
     this.log = log;
     this.config = config;
 		this.refreshed = false;
-		this.log(this.config)
 		if (this.config) {
+      this.log('Connecting to MaxCube')
 			this.cube = new MaxCube(this.config.ip, this.config.port);
 		}
 };
@@ -25,12 +25,20 @@ MaxCubePlatform.prototype = {
 				var myAccessories = [];
 				that.cube.getDeviceStatus().then(function (devices) {
 					if (this.refreshed){
+    			  that.log('Already refreshed');
 						return;
 					}
 					this.refreshed = true;
 				  devices.forEach(function (device) {
-						that.log('registering device', device)
-						myAccessories.push(new Thermostat(that.log, that.config, device, that.cube, Service, Characteristic));
+            that.log('gegting device info for '+ device.rf_address)
+            var deviceInfo = that.cube.getDeviceInfo(device.rf_address);
+
+            if (deviceInfo.device_type != 1) {
+              that.log('ignoring non thermostat device')
+            } else {
+  						that.log('registering device', device, deviceInfo)
+  						myAccessories.push(new Thermostat(that.log, that.config, device, deviceInfo, that.cube, Service, Characteristic));
+            }
 				  });
 				  that.cube.close();
 					callback(myAccessories);

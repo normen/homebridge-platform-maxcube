@@ -2,7 +2,7 @@ var Service;
 var Characteristic;
 
 
-function Thermostat(log, config, device, cube, service, characteristic){
+function Thermostat(log, config, device, deviceInfo, cube, service, characteristic){
     this.log = log;
     this.config = config;
 		this.device = device;
@@ -13,7 +13,7 @@ function Thermostat(log, config, device, cube, service, characteristic){
 		Service = service;
 		Characteristic = characteristic;
 
-		this.name = this.device.rf_address;
+		this.name = deviceInfo.device_name + ' (' + deviceInfo.room_name + ')';
 		this.temperatureDisplayUnits = Characteristic.TemperatureDisplayUnits.CELSIUS;
 		this.temperature = this.device.temp;
     this.targetTemperature = this.device.temp;
@@ -37,22 +37,42 @@ Thermostat.prototype = {
 	
 	setTargetHeatingCoolingState: function(value, callback) {
     var that = this;
+    var targetCoolingState = 'MANUAL';
+    
 		if(value == 0)
     {
-			this.log('EQ3 - '+this.name+' - Off');
+			this.log('EQ3 - '+this.name+' - Off');  
+      this.targetCoolingState = Characteristic.TargetHeatingCoolingState.OFF;
+      this.targetTemperature = 0;
 		}
 		else if(value == 1)
 		{
 			this.log('EQ3 - '+this.name+' - Day mode');
+      this.targetCoolingState = Characteristic.TargetHeatingCoolingState.DAY;
+      this.targetTemperature = 19;
 		}
 		else if(value == 2)
     {
     	this.log('EQ3 - '+this.name+' - Night mode');
+      this.targetCoolingState = Characteristic.TargetHeatingCoolingState.NIGHT;
+      this.targetTemperature = 5;
 		}
 	  else if(value == 3)
 		{
 	  	this.log('EQ3 - '+this.name+' - Auto mode');
+      this.targetCoolingState = Characteristic.TargetHeatingCoolingState.AUTO;
+      targetCoolingState = 'AUTO';
+      this.targetTemperature = null;
+		} else {
+		  return
 		}
+    
+		this.cube.getConnection().then(function () {
+			that.cube.initialised = true;
+			that.log('connection established');
+			that.log('setting temperature to: '+that.targetTemperature+ ', mode: '+ targetCoolingState);
+			that.cube.setTemperature(that.device.rf_address, that.targetTemperature, targetCoolingState);
+    });
 		callback(null, value);
 	},
 
