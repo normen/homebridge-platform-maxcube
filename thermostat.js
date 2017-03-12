@@ -43,7 +43,7 @@ Thermostat.prototype = {
     {
 			this.log('EQ3 - '+this.name+' - Off');  
       this.targetCoolingState = Characteristic.TargetHeatingCoolingState.OFF;
-      this.targetTemperature = 0;
+      this.targetTemperature = 10;
 		}
 		else if(value == 1)
 		{
@@ -55,14 +55,14 @@ Thermostat.prototype = {
     {
     	this.log('EQ3 - '+this.name+' - Night mode');
       this.targetCoolingState = Characteristic.TargetHeatingCoolingState.NIGHT;
-      this.targetTemperature = 5;
+      this.targetTemperature = 10;
 		}
 	  else if(value == 3)
 		{
 	  	this.log('EQ3 - '+this.name+' - Auto mode');
       this.targetCoolingState = Characteristic.TargetHeatingCoolingState.AUTO;
       targetCoolingState = 'AUTO';
-      this.targetTemperature = null;
+      this.targetTemperature = 19;
 		} else {
 		  return
 		}
