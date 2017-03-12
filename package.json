@@ -1,18 +1,17 @@
 {
   "name": "homebridge-platform-maxcube",
-  "version": "0.0.1",
-  "description": "EQ-3 MaxCube plugin for Homebridge",
+  "version": "0.0.2",
+  "description": "eq3 MaxCube plugin for Homebridge",
   "author": "Tobias Schlottke",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git://github.com/macnow/homebridge-platform-eq3btsmart.git"
   },
-  "scripts": {
-   },
+  "scripts": {},
   "bugs": {
-    "url": "https://github.com/macnow/homebridge-platform-eq3btsmart/issues",
-    "email": "macnow@gmail.com"
+    "url": "https://github.com/tobsch/homebridge-platform-maxcube/issues",
+    "email": "tobias.schlottke@gmail.com"
   },
   "keywords": [
     "homebridge-plugin",
@@ -33,5 +32,7 @@
   },
   "devDependencies": {
     "homebridge": "0.4.8"
-  }
+  },
+  "homepage": "https://github.com/tobsch/homebridge-platform-maxcube#readme",
+  "main": "index.js"
 }
