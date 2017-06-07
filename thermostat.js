@@ -47,6 +47,9 @@ function Thermostat(log, config, device, deviceInfo, cube, service, characterist
     } else {
       this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
     }
+    if(this.device.setpoint <= 10){
+      this.coolingState = Characteristic.TargetHeatingCoolingState.OFF;
+    }
   };
 
 Thermostat.prototype = {
@@ -55,23 +58,14 @@ Thermostat.prototype = {
     this.cube.getConnection().then(function () {
       that.cube.getDeviceStatus(that.device.rf_address).then(function (devices) {
         devices.forEach(function (device) {
-          that.device.initialized=device.initialized;
-          that.device.fromCmd=device.fromCmd;
-          that.device.error=device.error;
-          that.device.valid=device.valid;
-          that.device.mode=device.mode;
-          that.device.dst_active=device.dst_active;
-          that.device.gateway_known=device.gateway_known;
-          that.device.panel_locked=device.panel_locked;
-          that.device.link_error=device.link_error;
-          that.device.battery_low=device.battery_low;
-          that.device.valve=device.valve;
-          that.device.setpoint=device.setpoint;
-          that.device.temp=device.temp;
+          that.device = device;
           if(that.device.mode == "AUTO"){
             that.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
           } else {
             that.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
+          }
+          if(that.device.setpoint <= 10){
+            that.coolingState = Characteristic.TargetHeatingCoolingState.OFF;
           }
           if(that.device.temp != 0){
             that.lastNonZeroTemp = that.device.temp;
@@ -93,9 +87,10 @@ Thermostat.prototype = {
     this.refreshDevice();
     var that = this;
     var targetCoolingState = 'MANUAL';
+    var targetTemp = that.device.setpoint;
     if(value == 0) {
-      //this.coolingState = Characteristic.TargetHeatingCoolingState.OFF;
-      this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
+      this.coolingState = Characteristic.TargetHeatingCoolingState.OFF;
+      targetTemp = 10;
     }
     else if(value == 1) {
       this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
@@ -108,10 +103,11 @@ Thermostat.prototype = {
       this.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
       targetCoolingState = 'AUTO';
     } else {
+      that.log("Unknown HeatingCoolingState value");
     }
     this.cube.getConnection().then(function () {
-      that.log('setting mode: '+ targetCoolingState);
-      that.cube.setTemperature(that.device.rf_address, that.device.setpoint, targetCoolingState);
+      that.log('setting mode '+targetCoolingState+' at temperature '+targetTemp+'deg');
+      that.cube.setTemperature(that.device.rf_address, targetTemp, targetCoolingState);
     });
     callback(null, this.coolingState);
   },
@@ -132,7 +128,6 @@ Thermostat.prototype = {
     this.cube.getConnection().then(function () {
       that.log('setting temperature: '+ value);
       that.cube.setTemperature(that.device.rf_address, value, that.device.mode);
-      that.refreshDevice();
     });
     callback(null, value);
   },
