@@ -1,15 +1,37 @@
 var Service;
 var Characteristic;
-
-
+/*
+device:
+{ rf_address: '15b389',
+  initialized: false,
+  fromCmd: false,
+  error: false,
+  valid: false,
+  mode: 'AUTO',
+  dst_active: false,
+  gateway_known: false,
+  panel_locked: false,
+  link_error: false,
+  battery_low: false,
+  valve: 0,
+  setpoint: 0,
+  temp: 0 }
+deviceInfo:
+{ device_type: 1,
+  device_name: 'Süden',
+  room_name: 'Stube',
+  room_id: 1 }
+*/
 function Thermostat(log, config, device, deviceInfo, cube, service, characteristic){
+
     this.log = log;
     this.config = config;
     this.device = device;
     this.deviceInfo = deviceInfo;
-    
+
     this.cube = cube;
-    this.log('adding device: ' + device.rf_address)
+
+    this.lastNonZeroTemp = this.device.temp;
 
     Service = service;
     Characteristic = characteristic;
@@ -19,121 +41,109 @@ function Thermostat(log, config, device, deviceInfo, cube, service, characterist
 
     // set the temperatur to celcius
     this.temperatureDisplayUnits = Characteristic.TemperatureDisplayUnits.CELSIUS;
-    this.temperature = this.device.temp;
-    
-    this.refreshDevice();
+
+    if(this.device.mode == "AUTO"){
+      this.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
+    } else {
+      this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
+    }
   };
 
 Thermostat.prototype = {
   refreshDevice: function(){
-    //show temperature
-    if (this.temperature >= 10) {
-      this.heatingCoolingState = Characteristic.CurrentHeatingCoolingState.HEAT;
-      this.targetHeatingCoolingState = Characteristic.TargetHeatingCoolingState.AUTO;
-      this.log('setting mode to '+ this.heatingCoolingState + ' temperature to '+ this.temperature)
-    } else {
-      this.heatingCoolingState = Characteristic.CurrentHeatingCoolingState.OFF;
-      this.targetHeatingCoolingState = Characteristic.TargetHeatingCoolingState.OFF;
-      this.temperature = 10;
-      this.log('setting temp to off ', this.heatingCoolingState)
-    }
-
-    // auto mode
-    if (this.device.mode == 'AUTO'){
-      this.targetHeatingCoolingState = Characteristic.TargetHeatingCoolingState.AUTO;
-      this.heatingCoolingState = Characteristic.CurrentHeatingCoolingState.HEAT;
-    }
-    
-    this.targetTemperature = this.temperature;
+    var that = this;
+    this.cube.getConnection().then(function () {
+      that.cube.getDeviceStatus(that.device.rf_address).then(function (devices) {
+        devices.forEach(function (device) {
+          that.device.initialized=device.initialized;
+          that.device.fromCmd=device.fromCmd;
+          that.device.error=device.error;
+          that.device.valid=device.valid;
+          that.device.mode=device.mode;
+          that.device.dst_active=device.dst_active;
+          that.device.gateway_known=device.gateway_known;
+          that.device.panel_locked=device.panel_locked;
+          that.device.link_error=device.link_error;
+          that.device.battery_low=device.battery_low;
+          that.device.valve=device.valve;
+          that.device.setpoint=device.setpoint;
+          that.device.temp=device.temp;
+          if(that.device.mode == "AUTO"){
+            that.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
+          } else {
+            that.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
+          }
+          if(that.device.temp != 0){
+            that.lastNonZeroTemp = that.device.temp;
+          }
+        });
+      });
+    });
   },
   getCurrentHeatingCoolingState: function(callback) {
      this.refreshDevice();
-     callback(null, this.heatingCoolingState);
+     callback(null, this.coolingState);
   },
-  
+
   getTargetHeatingCoolingState: function(callback) {
      this.refreshDevice();
-     callback(null, this.targetHeatingCoolingState);
+     callback(null, this.coolingState);
   },
-  
   setTargetHeatingCoolingState: function(value, callback) {
+    this.refreshDevice();
     var that = this;
     var targetCoolingState = 'MANUAL';
-    
-    if(value == 0)
-    {
-      this.log('EQ3 - '+this.name+' - Off');  
-      this.targetCoolingState = Characteristic.TargetHeatingCoolingState.OFF;
-      this.targetTemperature = 0;
+    if(value == 0) {
+      //this.coolingState = Characteristic.TargetHeatingCoolingState.OFF;
+      this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
     }
-    else if(value == 1)
-    {
-      this.log('EQ3 - '+this.name+' - Day mode');
-      this.targetCoolingState = Characteristic.TargetHeatingCoolingState.DAY;
-      this.targetTemperature = 19;
+    else if(value == 1) {
+      this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
     }
-    else if(value == 2)
-    {
-      this.log('EQ3 - '+this.name+' - Night mode');
-      this.targetCoolingState = Characteristic.TargetHeatingCoolingState.NIGHT;
-      this.targetTemperature = 10;
+    else if(value == 2) {
+      //this.coolingState = Characteristic.TargetHeatingCoolingState.COOL;
+      this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
     }
-    else if(value == 3)
-    {
-      this.log('EQ3 - '+this.name+' - Auto mode');
-      this.targetCoolingState = Characteristic.TargetHeatingCoolingState.AUTO;
+    else if(value == 3) {
+      this.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
       targetCoolingState = 'AUTO';
-      this.targetTemperature = 19;
     } else {
-      this.log('unknown mode');
-      
     }
-    
     this.cube.getConnection().then(function () {
-      that.cube.initialised = true;
-      that.log('connection established');
-      that.log('setting temperature to: '+that.targetTemperature+ ', mode: '+ targetCoolingState);
-      that.cube.setTemperature(that.device.rf_address, that.targetTemperature, targetCoolingState);
+      that.log('setting mode: '+ targetCoolingState);
+      that.cube.setTemperature(that.device.rf_address, that.device.setpoint, targetCoolingState);
     });
-    callback(null, value);
+    callback(null, this.coolingState);
   },
 
   getCurrentTemperature: function(callback) {
     this.refreshDevice();
-    callback(null, this.temperature);
+    callback(null, this.lastNonZeroTemp);
   },
 
   getTargetTemperature: function(callback) {
     this.refreshDevice();
-    callback(null, this.targetTemperature);
+    callback(null, this.device.setpoint);
   },
 
   setTargetTemperature: function(value, callback) {
-    that = this;
-    this.targetTemperature = value;
-
-    if(this.targetTemperature != this.temperature)
-    {
-      this.log('EQ3 - '+this.name+' - Setting new temperature '+this.temperature+' -> '+this.targetTemperature);
-      this.temperature = this.targetTemperature;
-      this.cube.getConnection().then(function () {
-        that.device.temp = that.targetTemperature
-        that.cube.initialised = true;
-        that.log('connection established')
-        that.cube.setTemperature(that.device.rf_address, that.targetTemperature)
-        that.refreshDevice();
-        setTimeout(function(){
-          that.cube.close()
-        }, 1000)
-      });
-      
-    }
-    callback(null, this.targetTemperature);
+    var that = this;
+    that.refreshDevice();
+    this.cube.getConnection().then(function () {
+      that.log('setting temperature: '+ value);
+      that.cube.setTemperature(that.device.rf_address, value, that.device.mode);
+      that.refreshDevice();
+    });
+    callback(null, value);
   },
-  
+
   getTemperatureDisplayUnits: function(callback) {
     var error = null;
     callback(error, this.temperatureDisplayUnits);
+  },
+  getLowBatteryStatus: function(callback) {
+    this.refreshDevice();
+    callback(null, this.device.battery_low);
   },
 
   getServices: function(){
@@ -142,7 +152,7 @@ Thermostat.prototype = {
       .setCharacteristic(Characteristic.Manufacturer, 'EQ-3')
       .setCharacteristic(Characteristic.Model, 'EQ3 - '+ this.device.rf_address)
       .setCharacteristic(Characteristic.SerialNumber, this.device.rf_address)
-    
+
     var thermostatService = new Service.Thermostat(this.device.address);
       thermostatService
         .getCharacteristic(Characteristic.CurrentHeatingCoolingState)
@@ -165,6 +175,10 @@ Thermostat.prototype = {
       thermostatService
         .getCharacteristic(Characteristic.TemperatureDisplayUnits)
         .on('get', this.getTemperatureDisplayUnits.bind(this));
+
+      thermostatService
+        .addCharacteristic(new Characteristic.StatusLowBattery())
+        .on('get', this.getLowBatteryStatus.bind(this));
 
       return [informationService,thermostatService];
   }
