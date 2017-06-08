@@ -33,9 +33,7 @@ MaxCubePlatform.prototype = {
             //that.log('gegting device info for '+ device.rf_address)
             var deviceInfo = that.cube.getDeviceInfo(device.rf_address);
 
-            if (deviceInfo.device_type != 1) {
-              //that.log('ignoring non thermostat device')
-            } else {
+            if (deviceInfo.device_type == 1||deviceInfo.device_type == 2) {
               //that.log('registering device', deviceInfo.device_name+" ("+deviceInfo.room_name+")")
               myAccessories.push(new Thermostat(that.log, that.config, device, deviceInfo, that.cube, Service, Characteristic));
             }
