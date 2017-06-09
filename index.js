@@ -31,8 +31,9 @@ MaxCubePlatform.prototype = {
         that.refreshed = true;
         devices.forEach(function (device) {
           var deviceInfo = that.cube.getDeviceInfo(device.rf_address);
-          var wall = that.config.allow_wall_thermostat && (deviceInfo.device_type == 3);
-          if (deviceInfo.device_type == 1 || deviceInfo.device_type == 2 || wall) {
+          var isWall = that.config.allow_wall_thermostat && (deviceInfo.device_type == 3);
+          var deviceTypeOk = that.config.only_wall_thermostat ? (deviceInfo.device_type == 3) : (deviceInfo.device_type == 1 || deviceInfo.device_type == 2);
+          if (deviceTypeOk || isWall) {
             that.myAccessories.push(new Thermostat(that.log, that.config, device, deviceInfo, that.cube, Service, Characteristic));
           }
         });

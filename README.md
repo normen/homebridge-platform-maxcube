@@ -55,3 +55,21 @@ If you want to use the Max! software to configure your Max! cube its best to fir
 The plugin works bidirectionally, if you change the temperature on your actual thermostat it will be reflected in HomeKit. However theres a delay of up to five minutes until the plugin next polls the data from the Max! cube.
 
 This also means that you can trigger scenes based on a certain room temperature etc. as the change signal is broadcast in HomeKit.
+
+### AUTO mode and setting the temperature
+When you set the AUTO mode it is kept even if you change the temperature via HomeKit / Siri, same for manual mode.
+
+### Wall thermostat devices
+Wall thermostat devices are by default not included in HomeKit but if you add the option `allow_wall_thermostat` with any value except false/0 to the configuration they will be added as well. They could be useful as they also supply the temperature.
+
+If you want to use ONLY wall thermostat devices and control everything through them you can add the option `only_wall_thermostat` with any value except false/0, e.g.
+
+```
+{
+  "platform": "MaxCubePlatform",
+  "name": "MaxCube Platform",
+  "ip": "192.168.2.20",
+  "port": 62910,
+  "only_wall_thermostat": "true"
+}
+```
