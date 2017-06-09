@@ -76,7 +76,13 @@ Thermostat.prototype = {
   },
   getCurrentHeatingCoolingState: function(callback) {
      this.refreshDevice();
-     callback(null, this.coolingState);
+     if(this.coolingState == Characteristic.TargetHeatingCoolingState.AUTO){
+       //current state can't be "AUTO"
+       callback(null, Characteristic.TargetHeatingCoolingState.HEAT);
+     }
+     else {
+       callback(null, this.coolingState);
+     }
   },
 
   getTargetHeatingCoolingState: function(callback) {
