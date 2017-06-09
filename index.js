@@ -8,6 +8,7 @@ function MaxCubePlatform(log, config){
   this.log = log;
   this.config = config;
   this.refreshed = false;
+  this.myAccessories = [];
   if (this.config) {
     this.cube = new MaxCube(this.config.ip, this.config.port);
   }
@@ -21,12 +22,10 @@ MaxCubePlatform.prototype = {
         // We didn't connect yet and got an error,
         // probably the Cube couldn't be reached,
         // fulfill the callback so HomeBridge can initialize.
-        var myAccessories = [];
-        callback(myAccessories);
+        callback(that.myAccessories);
       }
     });
     this.cube.on('connected', function () {
-      var myAccessories = [];
       if (that.refreshed) return;
       that.cube.getDeviceStatus().then(function (devices) {
         that.refreshed = true;
@@ -34,12 +33,26 @@ MaxCubePlatform.prototype = {
           var deviceInfo = that.cube.getDeviceInfo(device.rf_address);
           var wall = that.config.allow_wall_thermostat && (deviceInfo.device_type == 3);
           if (deviceInfo.device_type == 1 || deviceInfo.device_type == 2 || wall) {
-            myAccessories.push(new Thermostat(that.log, that.config, device, deviceInfo, that.cube, Service, Characteristic));
+            that.myAccessories.push(new Thermostat(that.log, that.config, device, deviceInfo, that.cube, Service, Characteristic));
           }
         });
-        callback(myAccessories);
+        setTimeout(that.updateThermostatData.bind(that),300000);
+        callback(that.myAccessories);
       });
     });
+  },
+  updateThermostatData: function(){
+    var that = this;
+    this.cube.getConnection().then(function () {
+      that.cube.getDeviceStatus().then(function (devices) {
+        devices.forEach(function (device) {
+          that.myAccessories.forEach(function(thermostat){
+            thermostat.refreshDevice(device);
+          });
+        });
+      });
+    });
+    setTimeout(this.updateThermostatData.bind(this),300000);
   }
 };
 
