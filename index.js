@@ -19,6 +19,9 @@ MaxCubePlatform.prototype = {
     accessories: function(callback) {
       //this.log("Fetching maxCube devices.");
       var that = this;
+      this.cube.maxCubeLowLevel.on('error', function (error) {
+          that.log("Max! Cube Error:", error);
+      });
       this.cube.on('connected', function () {
         //that.log('Connected');
 
