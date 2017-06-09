@@ -17,7 +17,7 @@ MaxCubePlatform.prototype = {
     var that = this;
     this.cube.maxCubeLowLevel.on('error', function (error) {
       that.log("Max! Cube Error:", error);
-      if(!this.refreshed){
+      if(!that.refreshed){
         // We didn't connect yet and got an error,
         // probably the Cube couldn't be reached,
         // fulfill the callback so HomeBridge can initialize.
@@ -27,9 +27,9 @@ MaxCubePlatform.prototype = {
     });
     this.cube.on('connected', function () {
       var myAccessories = [];
-      if (this.refreshed) return;
+      if (that.refreshed) return;
       that.cube.getDeviceStatus().then(function (devices) {
-        this.refreshed = true;
+        that.refreshed = true;
         devices.forEach(function (device) {
           var deviceInfo = that.cube.getDeviceInfo(device.rf_address);
           var wall = that.config.allow_wall_thermostat && (deviceInfo.device_type == 3);
