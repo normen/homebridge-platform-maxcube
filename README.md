@@ -11,7 +11,8 @@ Supports the following features of Max! thermostat devices:
  - Setting the mode (AUTO/MANUAL)
  - Displaying the measured temperature
  - Displaying the set temperature
- - Displaying the battery warning
+ - Displaying the battery warning (also in Apples Home app)
+ - Displaying error warnings (only in certain apps)
 
 ## Example config
 ```
@@ -73,3 +74,18 @@ If you want to use ONLY wall thermostat devices and control everything through t
   "only_wall_thermostat": "true"
 }
 ```
+
+### Update rate
+If you want to increase or reduce the rate at which the data is polled from the cube you can add the option `update_rate` with a time in minutes to the configuration.
+```
+{
+  "platform": "MaxCubePlatform",
+  "name": "MaxCube Platform",
+  "ip": "192.168.2.20",
+  "port": 62910,
+  "update_rate": 10
+}
+```
+
+### Broadcast limit
+Note that the Max! cube has a built-in limit for sending data to the thermostat devices to obey to the laws about the 868MHz band. When you play around while setting up your system you might hit that limit and wonder why the thermostat devices don't react to signals anymore. To test if that is the case stop the HomeBridge server and log in with your Max! software. It will tell you if that is the case.

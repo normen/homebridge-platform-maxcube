@@ -144,27 +144,40 @@ Thermostat.prototype = {
     var that = this;
     var targetCoolingState = 'MANUAL';
     var targetTemp = that.device.setpoint;
-    if(value == 0) {
-      this.coolingState = Characteristic.TargetHeatingCoolingState.OFF;
+    if(value == Characteristic.TargetHeatingCoolingState.OFF) {
+      this.coolingState = value;
       targetTemp = 10;
+      that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
     }
-    else if(value == 1) {
+    else if(value == Characteristic.TargetHeatingCoolingState.HEAT) {
+      this.coolingState = value;
+      if(targetTemp <= 10){
+        targetTemp = 20;
+        that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
+      }
+    }
+    else if(value == Characteristic.TargetHeatingCoolingState.COOL) {
       this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
+      if(targetTemp <= 10){
+        targetTemp = 20;
+        that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
+      }
     }
-    else if(value == 2) {
-      //this.coolingState = Characteristic.TargetHeatingCoolingState.COOL;
-      this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
-    }
-    else if(value == 3) {
-      this.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
+    else if(value == Characteristic.TargetHeatingCoolingState.AUTO) {
+      this.coolingState = value;
+      if(targetTemp <= 10){
+        targetTemp = 20;
+        that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
+      }
       targetCoolingState = 'AUTO';
     } else {
       that.log("Unknown HeatingCoolingState value");
     }
     this.device.mode = targetCoolingState;
+    this.device.setpoint = targetTemp;
     this.cube.getConnection().then(function () {
       that.log(that.name+' - setting mode '+targetCoolingState+' at temperature '+targetTemp);
-      that.cube.setTemperature(that.device.rf_address, targetTemp, targetCoolingState);
+      that.cube.setTemperature(that.device.rf_address, Math.round(targetTemp), targetCoolingState);
     });
     callback(null, this.coolingState);
   },
@@ -179,7 +192,7 @@ Thermostat.prototype = {
     this.device.setpoint = value;
     this.cube.getConnection().then(function () {
       that.log(that.name+' - setting temperature '+ value);
-      that.cube.setTemperature(that.device.rf_address, value, that.device.mode);
+      that.cube.setTemperature(that.device.rf_address, Math.round(value), that.device.mode);
     });
     callback(null, value);
   },

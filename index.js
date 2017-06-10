@@ -10,6 +10,11 @@ function MaxCubePlatform(log, config){
   this.refreshed = false;
   this.myAccessories = [];
   if (this.config) {
+    if(this.config.update_rate){
+      this.updateRate = this.config.update_rate * 60000;
+    }else{
+      this.updateRate = 300000;
+    }
     this.cube = new MaxCube(this.config.ip, this.config.port);
   }
 };
@@ -37,7 +42,7 @@ MaxCubePlatform.prototype = {
             that.myAccessories.push(new Thermostat(that.log, that.config, device, deviceInfo, that.cube, Service, Characteristic));
           }
         });
-        setTimeout(that.updateThermostatData.bind(that),300000);
+        setTimeout(that.updateThermostatData.bind(that),that.updateRate);
         callback(that.myAccessories);
       });
     });
@@ -53,7 +58,7 @@ MaxCubePlatform.prototype = {
         });
       });
     });
-    setTimeout(this.updateThermostatData.bind(this),300000);
+    setTimeout(this.updateThermostatData.bind(this),this.updateRate);
   }
 };
 
