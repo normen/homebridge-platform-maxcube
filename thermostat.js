@@ -76,8 +76,12 @@ function Thermostat(log, config, device, deviceInfo, cube, service, characterist
     .on('get', this.getTemperatureDisplayUnits.bind(this));
 
   this.thermostatService
-    .addCharacteristic(Characteristic.StatusLowBattery)
+    .addCharacteristic(new Characteristic.StatusLowBattery())
     .on('get', this.getLowBatteryStatus.bind(this));
+
+  this.thermostatService
+    .addCharacteristic(new Characteristic.StatusFault())
+    .on('get', this.getErrorStatus.bind(this));
 };
 
 Thermostat.prototype = {
@@ -105,19 +109,23 @@ Thermostat.prototype = {
     var that = this;
     if(oldDevice.mode != that.device.mode){
       that.thermostatService.getCharacteristic(Characteristic.TargetHeatingCoolingState).updateValue(that.coolingState);
-      that.log(that.name+' - Broadcast target mode due to new data.');
+      that.log(that.name+' - received new target mode '+that.device.mode);
     }
     if(oldDevice.battery_low != that.device.battery_low){
       that.thermostatService.getCharacteristic(Characteristic.StatusLowBattery).updateValue(that.device.battery_low);
-      that.log(that.name+' - Broadcast battery state due to new data.');
+      that.log(that.name+' - received new low battery state '+that.device.battery_low);
     }
     if(oldDevice.setpoint != that.device.setpoint){
       that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(that.device.setpoint);
-      that.log(that.name+' - Broadcast target temperature due to new data.');
+      that.log(that.name+' - received new target temperature '+that.device.setpoint);
     }
     if(oldDevice.temp != that.device.temp){
       that.thermostatService.getCharacteristic(Characteristic.CurrentTemperature).updateValue(that.lastNonZeroTemp);
-      that.log(that.name+' - Broadcast temperature due to new data.');
+      that.log(that.name+' - received new temperature '+that.device.temp);
+    }
+    if(oldDevice.error != that.device.error || oldDevice.link_error != that.device.link_error){
+      that.thermostatService.getCharacteristic(Characteristic.StatusFault).updateValue(that.device.error||that.device.link_error);
+      that.log(that.name+' - received new error state');
     }
   },
   getCurrentHeatingCoolingState: function(callback) {
@@ -170,7 +178,7 @@ Thermostat.prototype = {
     var that = this;
     this.device.setpoint = value;
     this.cube.getConnection().then(function () {
-      that.log(that.name+' - setting temperature: '+ value);
+      that.log(that.name+' - setting temperature '+ value);
       that.cube.setTemperature(that.device.rf_address, value, that.device.mode);
     });
     callback(null, value);
@@ -180,6 +188,9 @@ Thermostat.prototype = {
   },
   getLowBatteryStatus: function(callback) {
     callback(null, this.device.battery_low);
+  },
+  getErrorStatus: function(callback) {
+    callback(null, this.device.error||this.device.link_error);
   },
   getServices: function(){
     return [this.informationService,this.thermostatService];
