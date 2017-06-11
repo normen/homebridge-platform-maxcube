@@ -37,6 +37,7 @@ function Thermostat(log, config, device, deviceInfo, cube, service, characterist
   this.lastNonZeroTemp = this.device.temp;
   this.name = this.deviceInfo.device_name + ' (' + this.deviceInfo.room_name + ')';
   this.temperatureDisplayUnits = Characteristic.TemperatureDisplayUnits.CELSIUS;
+  this.defaultTemp = config.default_temp?config.default_temp:20;
   if(this.device.mode == "AUTO"){
     this.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
   } else {
@@ -152,21 +153,21 @@ Thermostat.prototype = {
     else if(value == Characteristic.TargetHeatingCoolingState.HEAT) {
       this.coolingState = value;
       if(targetTemp <= 10){
-        targetTemp = 20;
+        targetTemp = this.defaultTemp;
         that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
       }
     }
     else if(value == Characteristic.TargetHeatingCoolingState.COOL) {
       this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
       if(targetTemp <= 10){
-        targetTemp = 20;
+        targetTemp = this.defaultTemp;
         that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
       }
     }
     else if(value == Characteristic.TargetHeatingCoolingState.AUTO) {
       this.coolingState = value;
       if(targetTemp <= 10){
-        targetTemp = 20;
+        targetTemp = this.defaultTemp;
         that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
       }
       targetCoolingState = 'AUTO';

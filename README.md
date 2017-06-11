@@ -42,10 +42,12 @@ All devices you have connected are automatically fetched from your MaxCube
 ### Heating/Cooling Mode
 HomeKit provides a "mode" setting for thermostat devices that allows toggling OFF/HEATING/COOLING/AUTO. This setting is used by this plugin to enable the "AUTO" mode of Max! thermostat devices or to turn them off (e.g. via Siri command). The following things happen when different modes are enabled:
 
- - OFF: The thermostat is set to 10 degrees and manual mode.
- - HEATING: The thermostat is set to manual mode, temperature is kept as is.
- - COOLING: The thermostat is set to manual mode, temperature is kept as is, it will report "HEATING" when next polled.
- - AUTO: The thermostat is set to AUTO mode.
+ - OFF: The thermostat is set to 10 degrees and manual mode. Setting any other mode when the thermostat is off will set the temperature to the default.
+ - HEATING: The thermostat is set to manual mode, temperature is kept as is if above 10.
+ - COOLING: The thermostat is set to manual mode, temperature is kept as is if above 10. The thermostat will report "HEATING" when next polled.
+ - AUTO: The thermostat is set to AUTO mode, temperature is kept as is if above 10.
+
+The default temperature when the thermostat is turned back on is 20 degrees. You can add a default_temp option to the config file to change this value, e.g. `"default_temp":22`.
 
 When the thermostat is set to 10 degrees or less manually it will also report "OFF".
 
@@ -58,7 +60,7 @@ The plugin works bidirectionally, if you change the temperature on your actual t
 This also means that you can trigger scenes based on a certain room temperature etc. as the change signal is broadcast in HomeKit.
 
 ### AUTO mode and setting the temperature
-When you set the AUTO mode it is kept even if you change the temperature via HomeKit / Siri, same for manual mode.
+When you set the AUTO mode it is kept even if you change the temperature via HomeKit / Siri, same for manual mode. When the thermostat is in AUTO mode and you change the temperature via HomeKit the Max! cube should set it back to the planned temperature on the next planned change.
 
 ### Wall thermostat devices
 Wall thermostat devices are by default not included in HomeKit but if you add the option `allow_wall_thermostat` with any value except false/0 to the configuration they will be added as well. They could be useful as they also supply the temperature.
