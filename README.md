@@ -88,4 +88,4 @@ If you want to increase or reduce the rate at which the data is polled from the 
 ```
 
 ### Broadcast limit
-Note that the Max! cube has a built-in limit for sending data to the thermostat devices to obey to the laws about the 868MHz band. When you play around while setting up your system you might hit that limit and wonder why the thermostat devices don't react to signals anymore. To test if that is the case stop the HomeBridge server and log in with your Max! software. It will tell you if that is the case.
+Note that the Max! cube has a built-in limit for sending data to the thermostat devices to obey to the laws about the 868MHz band. When you play around while setting up your system you might hit that limit and wonder why the thermostat devices don't react to signals anymore. To test if that is the case set the "Max! Link" switch to "off" and log in with your Max! software.
