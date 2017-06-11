@@ -175,10 +175,20 @@ Thermostat.prototype = {
     }
     this.device.mode = targetCoolingState;
     this.device.setpoint = targetTemp;
-    this.cube.getConnection().then(function () {
-      that.log(that.name+' - setting mode '+targetCoolingState+' at temperature '+targetTemp);
-      that.cube.setTemperature(that.device.rf_address, Math.round(targetTemp), targetCoolingState);
-    });
+    if(this.cube) try{
+      this.cube.getConnection().then(function () {
+        that.log(that.name+' - setting mode '+targetCoolingState+' at temperature '+targetTemp);
+        try{
+          that.cube.setTemperature(that.device.rf_address, Math.round(targetTemp), targetCoolingState);
+        }
+        catch(err){
+          that.log("Error sending data to Max! Cube: "+ err);
+        }
+      });
+    }
+    catch(err){
+      that.log("Error sending data to Max! Cube: "+ err);
+    }
     callback(null, this.coolingState);
   },
   getCurrentTemperature: function(callback) {
@@ -190,10 +200,20 @@ Thermostat.prototype = {
   setTargetTemperature: function(value, callback) {
     var that = this;
     this.device.setpoint = value;
-    this.cube.getConnection().then(function () {
-      that.log(that.name+' - setting temperature '+ value);
-      that.cube.setTemperature(that.device.rf_address, Math.round(value), that.device.mode);
-    });
+    if(this.cube) try{
+      this.cube.getConnection().then(function () {
+        that.log(that.name+' - setting temperature '+ value);
+        try{
+          that.cube.setTemperature(that.device.rf_address, Math.round(value), that.device.mode);
+        }
+        catch(err){
+          that.log("Error sending data to Max! Cube: "+ err);
+        }
+      });
+    }
+    catch(err){
+      that.log("Error sending data to Max! Cube: "+ err);
+    }
     callback(null, value);
   },
   getTemperatureDisplayUnits: function(callback) {

@@ -49,8 +49,8 @@ HomeKit provides a "mode" setting for thermostat devices that allows toggling OF
 
 When the thermostat is set to 10 degrees or less manually it will also report "OFF".
 
-### Using Max! software alongside HomeBridge
-If you want to use the Max! software to configure your Max! cube its best to first stop the homebridge server as you might get connection issues otherwise.
+### Using Max! software alongside HomeBridge / Max! Link Switch
+If you want to use the Max! software to configure your Max! cube you have to set the switch "Max! Link" in HomeKit to off, this will disconnect HomeBridge from the Max! Cube so that the Max! software can connect instead. Set it back to on to be able to control your heating from HomeKit again.
 
 ### Bidirectional
 The plugin works bidirectionally, if you change the temperature on your actual thermostat it will be reflected in HomeKit. However theres a delay of up to five minutes until the plugin next polls the data from the Max! cube.

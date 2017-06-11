@@ -5,33 +5,66 @@ var Thermostat = require('./thermostat');
  *  based on Sonos platform
  */
 function MaxCubePlatform(log, config){
+  if(config == null) return; //TODO: wtf is calling us during startup with no config and why?
   this.log = log;
   this.config = config;
   this.refreshed = false;
   this.myAccessories = [];
-  if (this.config) {
-    if(this.config.update_rate){
-      this.updateRate = this.config.update_rate * 60000;
-    }else{
-      this.updateRate = 300000;
-    }
-    this.cube = new MaxCube(this.config.ip, this.config.port);
+  this.myAccessories.push(new MaxCubeLinkSwitchAccessory(this.log, this.config, this));
+  if(this.config.update_rate){
+    this.updateRate = this.config.update_rate * 60000;
+  }else{
+    this.updateRate = 300000;
   }
 };
 MaxCubePlatform.prototype = {
   accessories: function(callback) {
+    this.startCube(callback);
+  },
+  startCube: function(callback){
+    if(this.cube) return;
     var that = this;
+    this.log("Try connecting to Max! Cube..");
+    this.cube = new MaxCube(this.config.ip, this.config.port);
+    var myCube = this.cube;
     this.cube.maxCubeLowLevel.on('error', function (error) {
+      // if we get a callback but theres a new cube instance -> ignore
+      if(!Object.is(that.cube, myCube)) {
+        that.log("Message from different cube instance - ignoring");
+        try{myCube.close()}catch(error){}
+        return;
+      }
       that.log("Max! Cube Error:", error);
+      // close connection and inform HomeKit about connection switch state
+      that.stopCube();
       if(!that.refreshed){
         // We didn't connect yet and got an error,
         // probably the Cube couldn't be reached,
         // fulfill the callback so HomeBridge can initialize.
-        callback(that.myAccessories);
+        that.log("Max! Cube could not be found, please restart HomeBridge with Max! Cube connected.");
+        if(!isNull(callback)) callback(that.myAccessories);
+      } else{
+        //try reconnect? timeout?
       }
     });
     this.cube.on('connected', function () {
-      if (that.refreshed) return;
+      // if we get a callback but theres a new cube instance -> ignore
+      if(!Object.is(that.cube, myCube)) {
+        that.log("Message from different cube instance - ignoring");
+        try{myCube.close()}catch(error){}
+        return;
+      }
+      that.log("Connected to Max! Cube..");
+      // inform HomeKit about connection switch state
+      that.myAccessories[0].sendStatus();
+      // if were connected before, only publish new cube info and return
+      if(that.refreshed){
+        that.myAccessories.forEach(function(thermostat){
+          thermostat.cube = that.cube;
+        });
+        return;
+      }
+      // first connection, list devices, create accessories and start update loop
       that.cube.getDeviceStatus().then(function (devices) {
         that.refreshed = true;
         devices.forEach(function (device) {
@@ -43,24 +76,92 @@ MaxCubePlatform.prototype = {
           }
         });
         setTimeout(that.updateThermostatData.bind(that),that.updateRate);
-        callback(that.myAccessories);
+        if(!isNull(callback)) callback(that.myAccessories);
       });
     });
   },
-  updateThermostatData: function(){
-    var that = this;
-    this.cube.getConnection().then(function () {
-      that.cube.getDeviceStatus().then(function (devices) {
-        devices.forEach(function (device) {
-          that.myAccessories.forEach(function(thermostat){
-            thermostat.refreshDevice(device);
-          });
-        });
+  stopCube: function(){
+    if(this.cube){
+      this.log("Closing connection to Max! Cube..");
+      try{this.cube.close()}catch(error){}
+      this.cube = null;
+      this.myAccessories.forEach(function(thermostat){
+        thermostat.cube = null;
       });
-    });
+      this.myAccessories[0].sendStatus();
+    }
+  },
+  updateThermostatData: function(){
+    // called periodically
     setTimeout(this.updateThermostatData.bind(this),this.updateRate);
+    if(!this.cube) return;
+    var that = this;
+    try{
+      this.cube.getConnection().then(function () {
+        if(!that.cube) return;
+        try{
+          that.cube.getDeviceStatus().then(function (devices) {
+            devices.forEach(function (device) {
+              that.myAccessories.forEach(function(thermostat){
+                thermostat.refreshDevice(device);
+              });
+            });
+          });
+        }
+        catch(err){
+          that.log("Error reading data from Max! Cube: ", err);
+        }
+      });
+    }
+    catch(err){
+      that.log("Error reading data from Max! Cube: ", err);
+    }
   }
 };
+
+// switch accessory to enable/disable cube connection
+function MaxCubeLinkSwitchAccessory(log, config, cubePlatform){
+  this.log = log;
+  this.config = config;
+  this.cubePlatform = cubePlatform;
+  this.name = "Max! Link";
+  this.service = new Service.Switch("Max! Link");
+  this.service.getCharacteristic(Characteristic.On).value = false;
+  this.service.getCharacteristic(Characteristic.On)
+      .on('set', this.setConnectionState.bind(this))
+      .on('get', this.getConnectionState.bind(this));
+}
+
+MaxCubeLinkSwitchAccessory.prototype = {
+  getServices: function() {
+    var informationService = new Service.AccessoryInformation();
+    informationService
+    .setCharacteristic(Characteristic.Manufacturer, "EQ-3")
+    .setCharacteristic(Characteristic.Model, "Max! Cube")
+    return [informationService, this.service];
+  },
+  setConnectionState: function(state, callback){
+    if(state){
+      this.cubePlatform.startCube();
+    }else{
+      this.cubePlatform.stopCube();
+    }
+    callback(null, state);
+  },
+  getConnectionState: function(callback){
+    callback(null, this.cubePlatform.cube != null);
+  },
+  sendStatus: function(){
+    this.service.getCharacteristic(Characteristic.On).updateValue(this.cubePlatform.cube != null);
+  },
+  refreshDevice(deviceInfo){
+    //only here so that update loop doesn't have to be complicated
+  }
+}
+
+function isNull(object) {
+    return object == undefined || null;
+}
 
 var Service;
 var Characteristic;
