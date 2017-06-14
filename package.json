@@ -1,12 +1,13 @@
 {
   "name": "homebridge-platform-maxcube",
-  "version": "0.0.2",
+  "version": "0.9.0",
   "description": "eq3 MaxCube plugin for Homebridge",
   "author": "Tobias Schlottke",
+  "contributors": ["Normen Hansen"],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/macnow/homebridge-platform-eq3btsmart.git"
+    "url": "https://github.com/tobsch/homebridge-platform-maxcube.git"
   },
   "scripts": {},
   "bugs": {
@@ -21,17 +22,19 @@
     "maxcube",
     "thermostat",
     "home",
-    "heating"
+    "heating",
+    "max",
+    "elv"
   ],
   "engines": {
     "node": ">=4.4.0",
-    "homebridge": ">=0.3.0"
+    "homebridge": ">=0.4.0"
   },
   "dependencies": {
     "maxcube": "^1.0.6"
   },
   "devDependencies": {
-    "homebridge": "0.4.8"
+    "homebridge": "0.4.10"
   },
   "homepage": "https://github.com/tobsch/homebridge-platform-maxcube#readme",
   "main": "index.js"
