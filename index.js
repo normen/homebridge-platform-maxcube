@@ -1,5 +1,6 @@
 var MaxCube = require('maxcube');
 var Thermostat = require('./thermostat');
+var ContactSensor = require('./contactsensor');
 
 /** Sample platform outline
  *  based on Sonos platform
@@ -69,8 +70,12 @@ MaxCubePlatform.prototype = {
         that.refreshed = true;
         devices.forEach(function (device) {
           var deviceInfo = that.cube.getDeviceInfo(device.rf_address);
+          var isShutter = deviceInfo.device_type == 4
           var isWall = that.config.allow_wall_thermostat && (deviceInfo.device_type == 3);
           var deviceTypeOk = that.config.only_wall_thermostat ? (deviceInfo.device_type == 3) : (deviceInfo.device_type == 1 || deviceInfo.device_type == 2);
+          if (isShutter) {
+            that.myAccessories.push(new ContactSensor(that.log, that.config, device, deviceInfo, that.cube, Service, Characteristic));
+          }
           if (deviceTypeOk || isWall) {
             that.myAccessories.push(new Thermostat(that.log, that.config, device, deviceInfo, that.cube, Service, Characteristic));
           }
