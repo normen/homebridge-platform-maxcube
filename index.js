@@ -97,7 +97,7 @@ MaxCubePlatform.prototype = {
     }
   },
   updateThermostatData: function(){
-    // called periodically
+    //called periodically
     setTimeout(this.updateThermostatData.bind(this),this.updateRate);
     if(!this.cube) return;
     var that = this;
