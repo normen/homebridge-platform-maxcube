@@ -69,6 +69,11 @@ function Thermostat(log, config, device, deviceInfo, cube, service, characterist
 
   this.thermostatService
     .getCharacteristic(Characteristic.TargetTemperature)
+    .setProps({
+      minValue: 10,
+      maxValue: 30,
+      minStep: 1
+    })
     .on('get', this.getTargetTemperature.bind(this))
     .on('set', this.setTargetTemperature.bind(this));
 
