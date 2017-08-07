@@ -10,6 +10,7 @@ function MaxCubePlatform(log, config){
   this.log = log;
   this.config = config;
   this.refreshed = false;
+  this.windowsensor = config["windowsensor"] || false;
   this.myAccessories = [];
   this.myAccessories.push(new MaxCubeLinkSwitchAccessory(this.log, this.config, this));
   if(this.config.update_rate){
@@ -73,7 +74,7 @@ MaxCubePlatform.prototype = {
           var isShutter = deviceInfo.device_type == 4
           var isWall = that.config.allow_wall_thermostat && (deviceInfo.device_type == 3);
           var deviceTypeOk = that.config.only_wall_thermostat ? (deviceInfo.device_type == 3) : (deviceInfo.device_type == 1 || deviceInfo.device_type == 2);
-          if (isShutter) {
+          if (isShutter && this.windowsensor) {
             that.myAccessories.push(new ContactSensor(that.log, that.config, device, deviceInfo, that.cube, Service, Characteristic));
           }
           if (deviceTypeOk || isWall) {
