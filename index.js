@@ -1,4 +1,4 @@
-var MaxCube = require('maxcube');
+var MaxCube = require('maxcube-window');
 var Thermostat = require('./thermostat');
 var ContactSensor = require('./contactsensor');
 
