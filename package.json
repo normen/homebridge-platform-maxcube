@@ -31,7 +31,7 @@
     "homebridge": ">=0.4.0"
   },
   "dependencies": {
-    "maxcube": "git+https://github.com/DanielWeeber/maxcube.git"
+    "maxcube-window": ">=1.0.0"
   },
   "devDependencies": {
     "homebridge": "0.4.10"
