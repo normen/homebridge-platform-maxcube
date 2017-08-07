@@ -35,7 +35,7 @@ function Thermostat(log, config, device, deviceInfo, cube, service, characterist
   this.deviceInfo = deviceInfo;
   this.cube = cube;
   this.lastNonZeroTemp = this.device.temp;
-  this.name = this.deviceInfo.device_name;
+  this.name = this.deviceInfo.device_name + ' (' + this.deviceInfo.room_name + ')';
   this.temperatureDisplayUnits = Characteristic.TemperatureDisplayUnits.CELSIUS;
   this.defaultTemp = config.default_temp?config.default_temp:20;
   if(this.device.mode == "AUTO"){
