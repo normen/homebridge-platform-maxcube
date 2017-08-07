@@ -74,7 +74,7 @@ MaxCubePlatform.prototype = {
           var isShutter = deviceInfo.device_type == 4
           var isWall = that.config.allow_wall_thermostat && (deviceInfo.device_type == 3);
           var deviceTypeOk = that.config.only_wall_thermostat ? (deviceInfo.device_type == 3) : (deviceInfo.device_type == 1 || deviceInfo.device_type == 2);
-          if (isShutter && this.windowsensor) {
+          if (isShutter && that.windowsensor) {
             that.myAccessories.push(new ContactSensor(that.log, that.config, device, deviceInfo, that.cube, Service, Characteristic));
           }
           if (deviceTypeOk || isWall) {
