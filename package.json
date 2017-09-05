@@ -1,9 +1,11 @@
 {
   "name": "homebridge-platform-maxcube",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "eq3 MaxCube plugin for Homebridge",
   "author": "Tobias Schlottke",
-  "contributors": ["Normen Hansen"],
+  "contributors": [
+    "Normen Hansen"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -27,8 +29,8 @@
     "elv"
   ],
   "engines": {
-    "node": ">=4.4.0",
-    "homebridge": ">=0.4.0"
+    "node": ">=6.0.0",
+    "homebridge": ">=0.4.10"
   },
   "dependencies": {
     "maxcube-window": ">=1.0.0"

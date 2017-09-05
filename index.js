@@ -42,9 +42,9 @@ MaxCubePlatform.prototype = {
       if(!that.refreshed){
         // We didn't connect yet and got an error,
         // probably the Cube couldn't be reached,
-        // fulfill the callback so HomeBridge can initialize.
+        // DO NOT fulfill the callback so HomeBridge doesn't initialize and delete the devices!
         that.log("Max! Cube could not be found, please restart HomeBridge with Max! Cube connected.");
-        if(!isNull(callback)) callback(that.myAccessories);
+        //if(!isNull(callback)) callback(that.myAccessories);
       } else{
         //try reconnect? timeout?
       }
