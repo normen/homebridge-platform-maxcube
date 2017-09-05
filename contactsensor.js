@@ -10,7 +10,7 @@ function ContactSensor(log, config, device, deviceInfo, cube, service, character
   this.deviceInfo = deviceInfo;
   this.cube = cube;
   this.open = this.device.open;
-  this.name = this.deviceInfo.device_name+' (CS)';
+  this.name = this.deviceInfo.device_name + ' (' + this.deviceInfo.room_name + ')';
 
 
   this.informationService = new Service.AccessoryInformation();
