@@ -10,14 +10,10 @@ function MaxCubePlatform(log, config){
   this.log = log;
   this.config = config;
   this.refreshed = false;
-  this.windowsensor = config["windowsensor"] || false;
+  this.windowsensor = config["windowsensor"] || true;
   this.myAccessories = [];
   this.myAccessories.push(new MaxCubeLinkSwitchAccessory(this.log, this.config, this));
-  if(this.config.update_rate){
-    this.updateRate = this.config.update_rate * 60000;
-  }else{
-    this.updateRate = 300000;
-  }
+  this.updateRate = 10000;
 };
 MaxCubePlatform.prototype = {
   accessories: function(callback) {
