@@ -63,7 +63,7 @@ This also means that you can trigger scenes based on a certain room temperature 
 When you set the AUTO mode it is kept even if you change the temperature via HomeKit / Siri, same for manual mode. When the thermostat is in AUTO mode and you change the temperature via HomeKit the Max! cube should set it back to the planned temperature on the next planned change.
 
 ### Wall thermostat devices
-Wall thermostat devices are by default not included in HomeKit but if you add the option `allow_wall_thermostat` with any value except false/0 to the configuration they will be added as well. They could be useful as they also supply the temperature.
+Wall thermostat devices are by default not included in HomeKit but if you add the option `allow_wall_thermostat` with any value except false/0 to the configuration they will be added as well. They could be useful as they also supply the temperature. They will work and control the temperature of their assigned room either way.
 
 If you want to use ONLY wall thermostat devices and control everything through them you can add the option `only_wall_thermostat` with a value of `true`.
 
@@ -78,19 +78,7 @@ If you want to use ONLY wall thermostat devices and control everything through t
 ```
 
 ### Window sensors
-If you want your window sensors to appear in HomeKit (they will work even if you don't) you can add an option `windowsensor` with a value of `true` to the config file.
-
-### Update rate
-If you want to increase or reduce the rate at which the data is polled from the cube you can add the option `update_rate` with a time in minutes to the configuration.
-```
-{
-  "platform": "MaxCubePlatform",
-  "name": "MaxCube Platform",
-  "ip": "192.168.2.20",
-  "port": 62910,
-  "update_rate": 10
-}
-```
+If you don't want your window sensors to appear in HomeKit (they will work even if they don't) you can add an option `windowsensor` with a value of `false` to the config file.
 
 ### Broadcast limit
 Note that the Max! cube has a built-in limit for sending data to the thermostat devices to obey to the laws about the 868MHz band. When you play around while setting up your system you might hit that limit and wonder why the thermostat devices don't react to signals anymore. To test if that is the case set the "Max! Link" switch to "off" and log in with your Max! software.
