@@ -37,13 +37,14 @@ function Thermostat(log, config, device, deviceInfo, cube, service, characterist
   this.lastNonZeroTemp = this.device.temp;
   this.name = this.deviceInfo.device_name + ' (' + this.deviceInfo.room_name + ')';
   this.temperatureDisplayUnits = Characteristic.TemperatureDisplayUnits.CELSIUS;
-  this.defaultTemp = config.default_temp?config.default_temp:20;
+  this.defaultTemp = config.default_temp || 20;
+  this.offTemp = config.off_temp || 10;
   if(this.device.mode == "AUTO"){
     this.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
   } else {
     this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
   }
-  if(this.device.setpoint <= 10){
+  if(this.device.setpoint <= this.offTemp){
     this.coolingState = Characteristic.TargetHeatingCoolingState.OFF;
   }
 
@@ -70,7 +71,7 @@ function Thermostat(log, config, device, deviceInfo, cube, service, characterist
   this.thermostatService
     .getCharacteristic(Characteristic.TargetTemperature)
     .setProps({
-      minValue: 10,
+      minValue: this.offTemp,
       maxValue: 30,
       minStep: 1
     })
@@ -102,7 +103,7 @@ Thermostat.prototype = {
     } else {
       that.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
     }
-    if(that.device.setpoint <= 10){
+    if(that.device.setpoint <= that.offTemp){
       that.coolingState = Characteristic.TargetHeatingCoolingState.OFF;
     }
     if(that.device.temp != 0){
@@ -152,26 +153,26 @@ Thermostat.prototype = {
     var targetTemp = that.device.setpoint;
     if(value == Characteristic.TargetHeatingCoolingState.OFF) {
       this.coolingState = value;
-      targetTemp = 10;
+      targetTemp = this.offTemp;
       that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
     }
     else if(value == Characteristic.TargetHeatingCoolingState.HEAT) {
       this.coolingState = value;
-      if(targetTemp <= 10){
+      if(targetTemp <= this.offTemp){
         targetTemp = this.defaultTemp;
         that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
       }
     }
     else if(value == Characteristic.TargetHeatingCoolingState.COOL) {
       this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
-      if(targetTemp <= 10){
+      if(targetTemp <= this.offTemp){
         targetTemp = this.defaultTemp;
         that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
       }
     }
     else if(value == Characteristic.TargetHeatingCoolingState.AUTO) {
       this.coolingState = value;
-      if(targetTemp <= 10){
+      if(targetTemp <= this.offTemp){
         targetTemp = this.defaultTemp;
         that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
       }

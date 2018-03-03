@@ -1,20 +1,20 @@
 {
   "name": "homebridge-platform-maxcube",
-  "version": "0.9.5",
-  "description": "eq3 MaxCube plugin for Homebridge",
-  "author": "Tobias Schlottke",
+  "version": "0.9.6",
+  "description": "eq3 Max!Cube plugin for Homebridge",
+  "author": "Normen Hansen",
   "contributors": [
-    "Normen Hansen"
+    "Tobias Schlottke",
+    "Daniel Weeber"
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tobsch/homebridge-platform-maxcube.git"
+    "url": "https://github.com/normen/homebridge-platform-maxcube.git"
   },
   "scripts": {},
   "bugs": {
-    "url": "https://github.com/tobsch/homebridge-platform-maxcube/issues",
-    "email": "tobias.schlottke@gmail.com"
+    "url": "https://github.com/normen/homebridge-platform-maxcube/issues"
   },
   "keywords": [
     "homebridge-plugin",
@@ -35,9 +35,6 @@
   "dependencies": {
     "maxcube-window": ">=1.0.0"
   },
-  "devDependencies": {
-    "homebridge": "0.4.10"
-  },
-  "homepage": "https://github.com/tobsch/homebridge-platform-maxcube#readme",
+  "homepage": "https://github.com/normen/homebridge-platform-maxcube#readme",
   "main": "index.js"
 }
