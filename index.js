@@ -10,10 +10,11 @@ function MaxCubePlatform(log, config){
   this.log = log;
   this.config = config;
   this.refreshed = false;
-  this.windowsensor = config["windowsensor"] || true;
+  this.windowsensor = config.windowsensor || true;
   this.myAccessories = [];
   this.myAccessories.push(new MaxCubeLinkSwitchAccessory(this.log, this.config, this));
   this.updateRate = 10000;
+  this.reconnectTimeout = 10000;
 };
 MaxCubePlatform.prototype = {
   accessories: function(callback) {
@@ -42,7 +43,9 @@ MaxCubePlatform.prototype = {
         that.log("Max! Cube could not be found, please restart HomeBridge with Max! Cube connected.");
         //if(!isNull(callback)) callback(that.myAccessories);
       } else{
-        //try reconnect? timeout?
+        // We were already connected and got an error, try reconnect
+        that.log("Reconnecting in "+that.reconnectTimeout/1000+" seconds");
+        setTimeout(that.startCube.bind(that),that.reconnectTimeout);
       }
     });
     this.cube.on('connected', function () {
