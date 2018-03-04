@@ -1,5 +1,5 @@
 # MaxCube module for homebridge
-Bridges the eq-3 Max!Cube box to Apples HomeKit.
+Bridges the eq-3 Max! Cube to Apples HomeKit.
 Automatically registers all devices itself so that you should instantly be able to control your home heating through Siri & HomeKit.
 
 ### Status of this package:
@@ -34,13 +34,13 @@ Supports the following features of Max! thermostat devices:
   ]
 }
 ```
-### Explanation:
-You have to find out the ip address through your DHCP server, the rest should automatically work out of the box:
+#### Explanation:
+You have to find out the IP address through your DHCP server, the rest should automatically work out of the box:
 All devices you have connected are automatically fetched from your MaxCube
 
 ## Additional Notes
 
-### Heating/Cooling Mode
+#### Heating/Cooling Mode
 HomeKit provides a "mode" setting for thermostat devices that allows toggling OFF/HEATING/COOLING/AUTO. This setting is used by this plugin to enable the "AUTO" mode of Max! thermostat devices or to turn them off (e.g. via Siri command). The following things happen when different modes are enabled:
 
  - OFF - The thermostat is set to off and manual mode. Setting any other mode when the thermostat is off will set the temperature to the default.
@@ -48,32 +48,32 @@ HomeKit provides a "mode" setting for thermostat devices that allows toggling OF
  - COOLING - The thermostat is set to manual mode, temperature is kept as is. The thermostat will report "HEATING" when next polled.
  - AUTO - The thermostat is set to AUTO mode.
 
-The default temperature when the thermostat is turned back on is 20 degrees. You can add a `default_temp` option to the config file to change this value. The off temperature is 10 degrees. You can add an `off_temp` option to the config file to change this value. When the thermostat is set to 10 degrees or less manually it will also report "OFF".
+The default temperature when the thermostat is turned back on is 20 degrees. You can add a `default_temp` option to the config file to change this value. The off temperature is 5 degrees. You can add an `off_temp` option to the config file to change this value. When the thermostat is set to 5 degrees or less manually it will also report "OFF".
 
 As this plugin has no way to access the Max! Cube schedule it can not set the temperature to the one given in the schedule.
 
-### Wall thermostat devices
+#### Wall thermostat devices
 Wall thermostat devices are by default not included in HomeKit but if you add the option `allow_wall_thermostat` to the configuration they will be added as well. They could be useful as they also supply the temperature. They will work and control the temperature of their assigned room either way.
 
 If you want to use ONLY wall thermostat devices and control everything through them you can add the option `only_wall_thermostat`.
 
-### Window sensors
+#### Window sensors
 If you don't want your window sensors to appear in HomeKit (they will work even if they don't) you can add an option `windowsensor` with a value of `false` to the config file.
 
-### Using Max! software alongside HomeBridge
+#### Using Max! software alongside HomeBridge
 If you want to use the Max! software to configure your Max! cube you have to set the switch "Max! Link" in HomeKit to off, this will disconnect HomeBridge from the Max! Cube so that the Max! software can connect instead. Set it back to on to be able to control your heating from HomeKit again.
 
-While this plugin is running you can not use the Max! internet control software and vice versa. Disable internet control in the Max! Cube.
+While this plugin is running you can not use the Max! internet control software and vice versa. Disable internet control in the Max! Cube to avoid conflicts.
 
-### Bidirectional
+#### HomeKit Triggers
 The plugin works bidirectionally, if you change the temperature on your actual thermostat it will be reflected in HomeKit. There can be a delay of up to a minute before the Max! Cube gets the data from the thermostat devices though.
 
 This means that you can trigger scenes based on a certain room temperature, an opened window etc. as the change signal is broadcast in HomeKit.
 
-### AUTO mode and setting the temperature
-When you set the AUTO mode it is kept even if you change the temperature via HomeKit / Siri, same for manual mode. When the thermostat is in AUTO mode and you change the temperature via HomeKit the Max! cube should set it back to the planned temperature on the next planned change.
+#### AUTO mode and setting the temperature
+Just changing the temperature will keep the current mode (MANUAL/AUTO). When the thermostat is in AUTO mode and you change the temperature via HomeKit the Max! cube will set it back to the planned temperature on the next planned temperature change.
 
-### Overview of optional parameters
+## Overview of optional parameters
 ```
 {
   "platform": "MaxCubePlatform",
@@ -99,3 +99,9 @@ To test if that is the case set the "Max! Link" switch to "off" and log in with 
 In my own experience there is a bug in the Max! Cube where when the thermostat devices are set to manual mode for an extended period of time they become unresponsive and do not react to signals from the Max! Cube anymore.
 
 I had to set my system to auto mode and create a schedule in the Max! software to solve this issue.
+
+### Error codes
+The plugin will report errors from the Max! Cube library but they are only visible in certain HomeKit apps. The code is a bit field, the single bits are as follows:
+- 1 = device error (generated by Max!)
+- 2 = link error (generated by Max!)
+- 4 = error sending data to thermostat (generated by plugin)
