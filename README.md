@@ -1,4 +1,4 @@
-# MaxCube module for homebridge
+# MaxCube module for homebridge [![NPM Version](https://img.shields.io/npm/v/homebridge-platform-maxcube.svg)](https://www.npmjs.com/package/homebridge-platform-maxcube)
 Bridges the eq-3 Max! Cube to Apples HomeKit.
 Automatically registers all devices itself so that you should instantly be able to control your home heating through Siri & HomeKit.
 
