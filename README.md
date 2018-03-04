@@ -50,7 +50,7 @@ HomeKit provides a "mode" setting for thermostat devices that allows toggling OF
 
 The default temperature when the thermostat is turned back on is 20 degrees. You can add a `default_temp` option to the config file to change this value. The off temperature is 10 degrees. You can add an `off_temp` option to the config file to change this value. When the thermostat is set to 10 degrees or less manually it will also report "OFF".
 
-As this plugin has no way to access the Max! Cube schedule it can not set the temperature to the one given in the
+As this plugin has no way to access the Max! Cube schedule it can not set the temperature to the one given in the schedule.
 
 ### Wall thermostat devices
 Wall thermostat devices are by default not included in HomeKit but if you add the option `allow_wall_thermostat` to the configuration they will be added as well. They could be useful as they also supply the temperature. They will work and control the temperature of their assigned room either way.
