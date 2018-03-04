@@ -194,7 +194,7 @@ Thermostat.prototype = {
           that.log("Error sending data to Max! Cube: "+ err);
           that.sendFault = true;
         }
-      });
+      }, function(){that.sendFault = true});
     }
     catch(err){
       that.log("Error sending data to Max! Cube: "+ err);
@@ -222,7 +222,7 @@ Thermostat.prototype = {
           that.log("Error sending data to Max! Cube: "+ err);
           that.sendFault = true;
         }
-      });
+      }, function(){that.sendFault = true});
     }
     catch(err){
       that.log("Error sending data to Max! Cube: "+ err);
