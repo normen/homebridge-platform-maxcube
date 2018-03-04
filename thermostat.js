@@ -38,7 +38,7 @@ function Thermostat(log, config, device, deviceInfo, cube, service, characterist
   this.name = this.deviceInfo.device_name + ' (' + this.deviceInfo.room_name + ')';
   this.temperatureDisplayUnits = Characteristic.TemperatureDisplayUnits.CELSIUS;
   this.defaultTemp = config.default_temp || 20;
-  this.offTemp = config.off_temp || 10;
+  this.offTemp = config.off_temp || 5;
   if(this.device.mode == "AUTO"){
     this.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
   } else {
