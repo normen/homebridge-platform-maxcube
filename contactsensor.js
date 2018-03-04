@@ -65,7 +65,17 @@ ContactSensor.prototype = {
     callback(null, this.device.battery_low);
   },
   getErrorStatus: function(callback) {
-    callback(null, this.device.error||this.device.link_error);
+    callback(null, this.errorStatus());
+  },
+  errorStatus: function(){
+    var status = 0;
+    if(this.device.error){
+      status|=1;
+    }
+    if(this.device.link_error){
+      status|=2;
+    }
+    return status;
   },
   getServices: function(){
     return [this.informationService,this.contactService];

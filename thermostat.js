@@ -39,6 +39,7 @@ function Thermostat(log, config, device, deviceInfo, cube, service, characterist
   this.temperatureDisplayUnits = Characteristic.TemperatureDisplayUnits.CELSIUS;
   this.defaultTemp = config.default_temp || 20;
   this.offTemp = config.off_temp || 5;
+  this.sendFault = false;
   if(this.device.mode == "AUTO"){
     this.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
   } else {
@@ -131,7 +132,7 @@ Thermostat.prototype = {
       that.log(that.name+' - received new temperature '+that.device.temp);
     }
     if(oldDevice.error != that.device.error || oldDevice.link_error != that.device.link_error){
-      that.thermostatService.getCharacteristic(Characteristic.StatusFault).updateValue(that.device.error||that.device.link_error);
+      that.thermostatService.getCharacteristic(Characteristic.StatusFault).updateValue(that.errorStatus());
       that.log(that.name+' - received new error state');
     }
   },
@@ -187,14 +188,17 @@ Thermostat.prototype = {
         that.log(that.name+' - setting mode '+targetCoolingState+' at temperature '+targetTemp);
         try{
           that.cube.setTemperature(that.device.rf_address, Math.round(targetTemp), targetCoolingState);
+          that.sendFault = false;
         }
         catch(err){
           that.log("Error sending data to Max! Cube: "+ err);
+          that.sendFault = true;
         }
       });
     }
     catch(err){
       that.log("Error sending data to Max! Cube: "+ err);
+      that.sendFault = true;
     }
     callback(null, this.coolingState);
   },
@@ -212,14 +216,17 @@ Thermostat.prototype = {
         that.log(that.name+' - setting temperature '+ value);
         try{
           that.cube.setTemperature(that.device.rf_address, Math.round(value), that.device.mode);
+          that.sendFault = false;
         }
         catch(err){
           that.log("Error sending data to Max! Cube: "+ err);
+          that.sendFault = true;
         }
       });
     }
     catch(err){
       that.log("Error sending data to Max! Cube: "+ err);
+      that.sendFault = true;
     }
     callback(null, value);
   },
@@ -230,7 +237,20 @@ Thermostat.prototype = {
     callback(null, this.device.battery_low);
   },
   getErrorStatus: function(callback) {
-    callback(null, this.device.error||this.device.link_error);
+    callback(null, this.errorStatus());
+  },
+  errorStatus: function(){
+    var status = 0;
+    if(this.device.error){
+      status|=1;
+    }
+    if(this.device.link_error){
+      status|=2;
+    }
+    if(this.sendFault){
+      status|=4;
+    }
+    return status;
   },
   getServices: function(){
     return [this.informationService,this.thermostatService];
