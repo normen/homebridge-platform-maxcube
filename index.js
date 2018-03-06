@@ -100,26 +100,16 @@ MaxCubePlatform.prototype = {
     setTimeout(this.updateThermostatData.bind(this),this.updateRate);
     if(!this.cube) return;
     var that = this;
-    try{
-      this.cube.getConnection().then(function () {
-        if(!that.cube) return;
-        try{
-          that.cube.getDeviceStatus().then(function (devices) {
-            devices.forEach(function (device) {
-              that.myAccessories.forEach(function(thermostat){
-                thermostat.refreshDevice(device);
-              });
-            });
+    this.cube.getConnection().then(function () {
+      if(!that.cube) return;
+      that.cube.getDeviceStatus().then(function (devices) {
+        devices.forEach(function (device) {
+          that.myAccessories.forEach(function(thermostat){
+            thermostat.refreshDevice(device);
           });
-        }
-        catch(err){
-          that.log("Error reading data from Max! Cube: ", err);
-        }
+        });
       });
-    }
-    catch(err){
-      that.log("Error reading data from Max! Cube: ", err);
-    }
+    });
   }
 };
 

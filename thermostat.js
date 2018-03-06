@@ -211,23 +211,11 @@ Thermostat.prototype = {
   setTargetTemperature: function(value, callback) {
     var that = this;
     this.device.setpoint = value;
-    if(this.cube) try{
-      this.cube.getConnection().then(function () {
-        that.log(that.name+' - setting temperature '+ value);
-        try{
-          that.cube.setTemperature(that.device.rf_address, Math.round(value), that.device.mode);
-          that.sendFault = false;
-        }
-        catch(err){
-          that.log("Error sending data to Max! Cube: "+ err);
-          that.sendFault = true;
-        }
-      }, function(){that.sendFault = true});
-    }
-    catch(err){
-      that.log("Error sending data to Max! Cube: "+ err);
-      that.sendFault = true;
-    }
+    this.cube.getConnection().then(function () {
+      that.log(that.name+' - setting temperature '+ value);
+      that.cube.setTemperature(that.device.rf_address, Math.round(value), that.device.mode);
+      that.sendFault = false;
+    }, function(){that.sendFault = true});
     callback(null, value);
   },
   getTemperatureDisplayUnits: function(callback) {
