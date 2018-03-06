@@ -98,11 +98,9 @@ MaxCubePlatform.prototype = {
   updateThermostatData: function(){
     // called periodically
     setTimeout(this.updateThermostatData.bind(this),this.updateRate);
-    if(!this.cube) return;
     var that = this;
-    this.cube.getConnection().then(function () {
-      if(!that.cube) return;
-      that.cube.getDeviceStatus().then(function (devices) {
+    if(that.cube) this.cube.getConnection().then(function () {
+      if(that.cube) that.cube.getDeviceStatus().then(function (devices) {
         devices.forEach(function (device) {
           that.myAccessories.forEach(function(thermostat){
             thermostat.refreshDevice(device);

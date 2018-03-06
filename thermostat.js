@@ -211,7 +211,7 @@ Thermostat.prototype = {
   setTargetTemperature: function(value, callback) {
     var that = this;
     this.device.setpoint = value;
-    this.cube.getConnection().then(function () {
+    if(this.cube) this.cube.getConnection().then(function () {
       that.log(that.name+' - setting temperature '+ value);
       that.cube.setTemperature(that.device.rf_address, Math.round(value), that.device.mode);
       that.sendFault = false;
