@@ -45,13 +45,13 @@ HomeKit provides a "mode" setting for thermostat devices that allows toggling Of
 
 The modes mean different things for this plugin:
 
-##### Off = off temperature + manual mode
+#### Off = off temperature + manual mode
 Setting any other mode when the thermostat is off will set the temperature to the default.
 
-##### Heating or Cooling = manual mode
+#### Heating or Cooling = manual mode
 Both set the thermostat to manual mode, the thermostat will always report "HEATING" when polled. Setting manual mode prevents the Max! schedule from taking over so it can be used to make "vacation" scenes in HomeKit.
 
-##### Auto = auto mode
+#### Auto = auto mode
 The thermostat is in auto mode and will work as if HomeKit was controlling it by hand or the web interface. It will work off the schedule set in the Max! software and set the temperature at the programmed times.
 
 The default temperature when the thermostat is turned back on is 20 degrees. You can add a `default_temp` option to the config file to change this value. As this plugin has currently no way to access the Max! Cube schedule it can not set the temperature to the one given in the schedule.
