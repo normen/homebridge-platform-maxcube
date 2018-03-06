@@ -6,7 +6,6 @@ var ContactSensor = require('./contactsensor');
  *  based on Sonos platform
  */
 function MaxCubePlatform(log, config){
-  if(config == null) return; //TODO: wtf is calling us during startup with no config and why?
   this.log = log;
   this.config = config;
   this.refreshed = false;
@@ -174,5 +173,5 @@ var Characteristic;
 module.exports = function(homebridge) {
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
-  homebridge.registerPlatform('homebridge-platform-maxcube', 'MaxCubePlatform', MaxCubePlatform, true);
+  homebridge.registerPlatform('homebridge-platform-maxcube', 'MaxCubePlatform', MaxCubePlatform);
 }
