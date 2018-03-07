@@ -45,7 +45,7 @@ HomeKit provides a "mode" setting for thermostat devices that allows toggling Of
 
 Note that some of these work different than in Max! or on the thermostats themselves. Enabling the auto mode will for example _not_ change the temperature to avoid issues where scenes in HomeKit set the mode and temperature in short succession.
 
-The modes mean different things in HomeKit the Max! Cube:
+The modes mean different things in HomeKit and in the Max! Cube:
 
 #### Off = off temperature + manual mode
 The thermostat is set to the off temperature defined in Max!. Setting manual mode prevents the Max! schedule from taking over. Setting any other mode when the thermostat is off will set the temperature to the default.
