@@ -14,7 +14,6 @@ function MaxCubePlatform(log, config){
   this.myAccessories = [];
   this.myAccessories.push(new MaxCubeLinkSwitchAccessory(this.log, this.config, this));
   this.updateRate = 10000;
-  this.reconnectTimeout = 10000;
   this.cube = null;
 };
 MaxCubePlatform.prototype = {
