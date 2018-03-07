@@ -2,111 +2,86 @@ var MaxCube = require('maxcube2');
 var Thermostat = require('./thermostat');
 var ContactSensor = require('./contactsensor');
 
-/** Sample platform outline
- *  based on Sonos platform
- */
 function MaxCubePlatform(log, config){
   this.log = log;
   this.config = config;
-  this.refreshed = false;
+  this.wasConnected = false;
+  this.paused = false;
   this.windowsensor = config.windowsensor || true;
   this.myAccessories = [];
   this.myAccessories.push(new MaxCubeLinkSwitchAccessory(this.log, this.config, this));
   this.updateRate = 10000;
   this.reconnectTimeout = 10000;
+  this.cube = null;
 };
 MaxCubePlatform.prototype = {
   accessories: function(callback) {
-    this.startCube(callback);
-  },
-  startCube: function(callback){
     if(this.cube) return;
     var that = this;
-    this.log("Try connecting to Max! Cube..");
-    this.cube = new MaxCube(this.config.ip, this.config.port);
-    var myCube = this.cube;
-    this.cube.maxCubeLowLevel.on('error', function (error) {
-      // if we get a callback but theres a new cube instance -> ignore
-      if(!Object.is(that.cube, myCube)) {
-        that.log("Message from different cube instance - ignoring");
-        try{myCube.close()}catch(error){}
-        return;
-      }
-      that.log("Max! Cube Error:", error);
-      // close connection and inform HomeKit about connection switch state
-      that.stopCube();
-      if(!that.refreshed){
+    this.startCube();
+
+    this.cube.on('error', function (error) {
+      if(!that.wasConnected){
         // We didn't connect yet and got an error,
         // probably the Cube couldn't be reached,
         // DO NOT fulfill the callback so HomeBridge doesn't initialize and delete the devices!
         that.log("Max! Cube could not be found, please restart HomeBridge with Max! Cube connected.");
-        //if(!isNull(callback)) callback(that.myAccessories);
+        //callback(that.myAccessories);
       } else{
-        // We were already connected and got an error, try reconnect
-        that.log("Reconnecting in "+that.reconnectTimeout/1000+" seconds");
-        setTimeout(that.startCube.bind(that),that.reconnectTimeout);
+        that.log("Max! Cube connection error:", error);
+        // inform HomeKit about connection switch state
+        that.myAccessories[0].sendStatus();
+        // We were already connected and got an error, it will try and reconnect on the next list update
       }
     });
     this.cube.on('connected', function () {
-      // if we get a callback but theres a new cube instance -> ignore
-      if(!Object.is(that.cube, myCube)) {
-        that.log("Message from different cube instance - ignoring");
-        try{myCube.close()}catch(error){}
-        return;
-      }
       that.log("Connected to Max! Cube..");
       // inform HomeKit about connection switch state
       that.myAccessories[0].sendStatus();
-      // if were connected before, only publish new cube info and return
-      if(that.refreshed){
-        that.myAccessories.forEach(function(thermostat){
-          thermostat.cube = that.cube;
+      if(!that.wasConnected){
+        // first connection, list devices, create accessories and start update loop
+        that.cube.getDeviceStatus().then(function (devices) {
+          that.wasConnected = true;
+          devices.forEach(function (device) {
+            var deviceInfo = that.cube.getDeviceInfo(device.rf_address);
+            var isShutter = deviceInfo.device_type == 4
+            var isWall = that.config.allow_wall_thermostat && (deviceInfo.device_type == 3);
+            var deviceTypeOk = that.config.only_wall_thermostat ? (deviceInfo.device_type == 3) : (deviceInfo.device_type == 1 || deviceInfo.device_type == 2);
+            if (isShutter && that.windowsensor) {
+              that.myAccessories.push(new ContactSensor(that.log, that.config, device, that.cube, Service, Characteristic));
+            }
+            if (deviceTypeOk || isWall) {
+              that.myAccessories.push(new Thermostat(that.log, that.config, device, that.cube, Service, Characteristic));
+            }
+          });
+          that.updateThermostatData();
+          callback(that.myAccessories);
         });
-        return;
       }
-      // first connection, list devices, create accessories and start update loop
-      that.cube.getDeviceStatus().then(function (devices) {
-        that.refreshed = true;
-        devices.forEach(function (device) {
-          var deviceInfo = that.cube.getDeviceInfo(device.rf_address);
-          var isShutter = deviceInfo.device_type == 4
-          var isWall = that.config.allow_wall_thermostat && (deviceInfo.device_type == 3);
-          var deviceTypeOk = that.config.only_wall_thermostat ? (deviceInfo.device_type == 3) : (deviceInfo.device_type == 1 || deviceInfo.device_type == 2);
-          if (isShutter && that.windowsensor) {
-            that.myAccessories.push(new ContactSensor(that.log, that.config, device, that.cube, Service, Characteristic));
-          }
-          if (deviceTypeOk || isWall) {
-            that.myAccessories.push(new Thermostat(that.log, that.config, device, that.cube, Service, Characteristic));
-          }
-        });
-        setTimeout(that.updateThermostatData.bind(that),that.updateRate);
-        if(!isNull(callback)) callback(that.myAccessories);
-      });
     });
   },
+  startCube: function(){
+    this.log("Try connecting to Max! Cube..");
+    this.paused = false;
+    if(!this.cube){
+      this.cube = new MaxCube(this.config.ip, this.config.port);
+    }
+    this.cube.getConnection();
+  },
   stopCube: function(){
+    this.log("Closing connection to Max! Cube..");
+    this.paused = true;
     if(this.cube){
-      this.log("Closing connection to Max! Cube..");
       try{this.cube.close()}catch(error){}
-      this.cube = null;
-      this.myAccessories.forEach(function(thermostat){
-        thermostat.cube = null;
-      });
       this.myAccessories[0].sendStatus();
     }
   },
   updateThermostatData: function(){
-    // called periodically
+    // called periodically to trigger maxcube data update
     setTimeout(this.updateThermostatData.bind(this),this.updateRate);
     var that = this;
-    if(that.cube) this.cube.getConnection().then(function () {
-      if(that.cube) that.cube.getDeviceStatus().then(function (devices) {
-        devices.forEach(function (device) {
-          that.myAccessories.forEach(function(thermostat){
-            thermostat.refreshDevice(device);
-          });
-        });
-      });
+    if(!this.paused) this.cube.getConnection().then(function () {
+      that.cube.updateDeviceStatus();
     });
   }
 };
@@ -141,13 +116,10 @@ MaxCubeLinkSwitchAccessory.prototype = {
     callback(null, state);
   },
   getConnectionState: function(callback){
-    callback(null, this.cubePlatform.cube != null);
+    callback(null, this.cubePlatform.cube.initialised);
   },
   sendStatus: function(){
-    this.service.getCharacteristic(Characteristic.On).updateValue(this.cubePlatform.cube != null);
-  },
-  refreshDevice(deviceInfo){
-    //only here so that update loop doesn't have to be complicated
+    this.service.getCharacteristic(Characteristic.On).updateValue(this.cubePlatform.cube.initialised);
   }
 }
 

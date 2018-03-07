@@ -28,13 +28,17 @@ function ContactSensor(log, config, device, cube, service, characteristic){
     .addCharacteristic(new Characteristic.StatusLowBattery())
     .on('get', this.getLowBatteryStatus.bind(this));
 
+  this.cube.on('updated_list', this.refreshDevice.bind(this));
 };
 
 ContactSensor.prototype = {
-  refreshDevice: function(device){
-    // this is called by the global data update loop
-    if(device.rf_address!=this.device.rf_address) return;
+  refreshDevice: function(devices){
     var that = this;
+    let device = devices.filter(function(item) { return item.rf_address === that.device.rf_address; })[0];
+    if(!device) {
+      return;
+    }
+    this.deviceInfo = that.cube.getDeviceInfo(device.rf_address);
     var oldDevice = that.device;
     if(device.open) {
       that.openState = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;

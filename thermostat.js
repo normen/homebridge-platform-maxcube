@@ -38,10 +38,10 @@ function Thermostat(log, config, device, cube, service, characteristic){
   Characteristic = characteristic;
   this.log = log;
   this.config = config;
+  this.cube = cube;
   this.device = device;
   this.deviceInfo = cube.getDeviceInfo(device.rf_address);
   this.deviceConfig = cube.getDeviceConfiguration(device.rf_address);
-  this.cube = cube;
   this.lastNonZeroTemp = this.device.temp;
   this.name = this.deviceInfo.device_name + ' (' + this.deviceInfo.room_name + ')';
   this.temperatureDisplayUnits = Characteristic.TemperatureDisplayUnits.CELSIUS;
@@ -99,13 +99,21 @@ function Thermostat(log, config, device, cube, service, characteristic){
   this.thermostatService
     .addCharacteristic(new Characteristic.StatusFault())
     .on('get', this.getErrorStatus.bind(this));
+
+  this.cube.on('updated_list', this.refreshDevice.bind(this));
 };
 
 Thermostat.prototype = {
-  refreshDevice: function(device){
-    // this is called by the global data update loop
-    if(device.rf_address!=this.device.rf_address) return;
+  refreshDevice: function(devices){
     var that = this;
+    let device = devices.filter(function(item) { return item.rf_address === that.device.rf_address; })[0];
+    if(!device) {
+      return;
+    }
+
+    this.deviceInfo = that.cube.getDeviceInfo(device.rf_address);
+    this.deviceConfig = that.cube.getDeviceConfiguration(device.rf_address);
+
     var oldDevice = that.device;
     that.device = device;
     if(that.device.mode == "AUTO"){
