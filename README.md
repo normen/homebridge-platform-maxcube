@@ -49,13 +49,13 @@ The modes mean different things in HomeKit the Max! Cube:
 The thermostat is set to the off temperature defined in Max!. Setting manual mode prevents the Max! schedule from taking over. Setting any other mode when the thermostat is off will set the temperature to the default.
 
 #### Heating = manual mode
-Sets the thermostat to manual mode and automatically sets the temperature to the "comfort" temperature defined in Max!. Setting manual mode prevents the Max! schedule from taking over so it can be used to make "vacation" scenes in HomeKit.
+Sets the thermostat to manual mode. Setting manual mode prevents the Max! schedule from taking over so it can be used to make "vacation" scenes in HomeKit. The temperature is kept as it is to avoid issues where scenes in HomeKit set the mode and temperature in short succession.
 
 #### Cooling = eco temperature + manual mode
 Sets the thermostat to manual mode and automatically sets the temperature to the "eco" temperature defined in Max!. Setting manual mode prevents the Max! schedule from taking over so it can be used to make "vacation" scenes in HomeKit.
 
 #### Auto = auto mode
-The thermostat is set to auto mode. From HomeKit it will work as if you were controlling it by hand or the web interface. It will (re)set the temperature at the programmed times and otherwise keep the temperature you set.
+The thermostat is set to auto mode. From HomeKit it will work as if you were controlling it by hand or the web interface. It will (re)set the temperature at the programmed times and otherwise keep the temperature you set. The temperature is kept as it is to avoid issues where scenes in HomeKit set the mode and temperature in short succession.
 
 ### Using Max! software alongside HomeBridge
 If you want to use the Max! software to configure your Max! cube you have to set the switch "Max! Link" in HomeKit to off, this will disconnect HomeBridge from the Max! Cube so that the Max! software can connect instead. Set it back to on to be able to control your heating from HomeKit again.
