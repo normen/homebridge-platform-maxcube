@@ -63,7 +63,7 @@ function Thermostat(homebridge, platform, device){
     .addCharacteristic(new Characteristic.StatusFault())
     .on('get', this.getErrorStatus.bind(this));
 
-  this.cube.on('updated_list', this.refreshDevice.bind(this));
+  this.cube.on('device_list', this.refreshDevice.bind(this));
 };
 
 Thermostat.prototype = {

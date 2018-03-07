@@ -27,7 +27,7 @@ function ContactSensor(homebridge, platform, device){
     .addCharacteristic(new Characteristic.StatusLowBattery())
     .on('get', this.getLowBatteryStatus.bind(this));
 
-  this.cube.on('updated_list', this.refreshDevice.bind(this));
+  this.cube.on('device_list', this.refreshDevice.bind(this));
 };
 
 ContactSensor.prototype = {
