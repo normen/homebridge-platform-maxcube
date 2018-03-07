@@ -123,7 +123,7 @@ The plugin will report errors from the Max! Cube library to HomeKit but they are
 ### Version History
 #### v1.1.0
 - Reads default values from Max! settings
-- Allow toggling off/eco/comfort/auto via HomeKit mode
+- Allow toggling off/eco/manual/auto via HomeKit mode
 - Cleanup handling of cube connection with new maxcube2 library
 #### v1.0.0
 - First full-feature release
