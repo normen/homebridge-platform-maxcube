@@ -79,30 +79,30 @@ Thermostat.prototype = {
     if(!device) {
       return;
     }
-    this.deviceInfo = that.cube.getDeviceInfo(device.rf_address);
-    this.deviceConfig = that.cube.getDeviceConfiguration(device.rf_address);
-    var oldDevice = that.device;
-    that.device = device;
+    this.deviceInfo = this.cube.getDeviceInfo(device.rf_address);
+    this.deviceConfig = this.cube.getDeviceConfiguration(device.rf_address);
+    var oldDevice = this.device;
+    this.device = device;
     this.checkHeatingCoolingState();
-    if(that.device.temp != 0){
-      that.lastNonZeroTemp = that.device.temp;
+    if(this.device.temp != 0){
+      this.lastNonZeroTemp = this.device.temp;
     }
     // publish changes in data so events can be triggered by data changes
-    if(oldDevice.battery_low != that.device.battery_low){
-      that.thermostatService.getCharacteristic(Characteristic.StatusLowBattery).updateValue(that.device.battery_low);
-      that.log(that.name+' - received new low battery state '+that.device.battery_low);
+    if(oldDevice.battery_low != this.device.battery_low){
+      this.thermostatService.getCharacteristic(Characteristic.StatusLowBattery).updateValue(this.device.battery_low);
+      this.log(this.name+' - received new low battery state '+this.device.battery_low);
     }
-    if(oldDevice.setpoint != that.device.setpoint){
-      that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(that.device.setpoint);
-      that.log(that.name+' - received new target temperature '+that.device.setpoint);
+    if(oldDevice.setpoint != this.device.setpoint){
+      this.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(this.device.setpoint);
+      this.log(this.name+' - received new target temperature '+this.device.setpoint);
     }
-    if(oldDevice.temp != that.device.temp){
-      that.thermostatService.getCharacteristic(Characteristic.CurrentTemperature).updateValue(that.lastNonZeroTemp);
-      that.log(that.name+' - received new temperature '+that.device.temp);
+    if(oldDevice.temp != this.device.temp){
+      this.thermostatService.getCharacteristic(Characteristic.CurrentTemperature).updateValue(this.lastNonZeroTemp);
+      this.log(this.name+' - received new temperature '+this.device.temp);
     }
-    if(oldDevice.error != that.device.error || oldDevice.link_error != that.device.link_error){
-      that.thermostatService.getCharacteristic(Characteristic.StatusFault).updateValue(that.errorStatus());
-      that.log(that.name+' - received new error state');
+    if(oldDevice.error != this.device.error || oldDevice.link_error != this.device.link_error){
+      this.thermostatService.getCharacteristic(Characteristic.StatusFault).updateValue(this.errorStatus());
+      this.log(this.name+' - received new error state');
     }
   },
   checkHeatingCoolingState: function(){
@@ -117,7 +117,7 @@ Thermostat.prototype = {
       this.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
     }
     if(oldCoolingState != this.coolingState){
-      that.log(that.name+' - received new target mode '+that.device.mode);
+      this.log(this.name+' - received new target mode '+this.device.mode);
       this.thermostatService.getCharacteristic(Characteristic.TargetHeatingCoolingState).updateValue(this.coolingState);
     }
   },
@@ -137,29 +137,29 @@ Thermostat.prototype = {
   setTargetHeatingCoolingState: function(value, callback) {
     let that = this;
     var targetMode = 'MANUAL';
-    var targetTemp = that.device.setpoint;
+    var targetTemp = this.device.setpoint;
     if(value == Characteristic.TargetHeatingCoolingState.OFF) {
       this.coolingState = value;
       targetTemp = this.offTemp;
-      that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
+      this.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
     }
     else if(value == Characteristic.TargetHeatingCoolingState.HEAT) {
       this.coolingState = value;
       targetTemp = this.comfortTemp;
-      that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
+      this.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
     }
     else if(value == Characteristic.TargetHeatingCoolingState.COOL) {
       this.coolingState = value;
       targetTemp = this.ecoTemp;
-      that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
+      this.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
     }
     else if(value == Characteristic.TargetHeatingCoolingState.AUTO) {
       this.coolingState = value;
       targetTemp = this.comfortTemp;
-      that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
+      this.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
       targetMode = 'AUTO';
     } else {
-      that.log("Unknown HeatingCoolingState value");
+      this.log("Unknown HeatingCoolingState value");
     }
     this.device.mode = targetMode;
     this.device.setpoint = targetTemp;

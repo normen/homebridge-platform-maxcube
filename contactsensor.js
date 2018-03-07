@@ -37,23 +37,23 @@ ContactSensor.prototype = {
     if(!device) {
       return;
     }
-    this.deviceInfo = that.cube.getDeviceInfo(device.rf_address);
-    var oldDevice = that.device;
+    this.deviceInfo = this.cube.getDeviceInfo(device.rf_address);
+    var oldDevice = this.device;
     if(device.open) {
-      that.openState = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
+      this.openState = Characteristic.ContactSensorState.CONTACT_NOT_DETECTED;
     }
     else {
-      that.openState = Characteristic.ContactSensorState.CONTACT_DETECTED;
+      this.openState = Characteristic.ContactSensorState.CONTACT_DETECTED;
     }
     // publish changes in data so events can be triggered by data changes
-    if(oldDevice.open != that.openState){
-      that.contactService.getCharacteristic(Characteristic.ContactSensorState).updateValue(that.openState);
-      that.device.open = (that.openState?true:false);
-      that.log(that.name+' - received new open '+ that.openState);
+    if(oldDevice.open != this.openState){
+      this.contactService.getCharacteristic(Characteristic.ContactSensorState).updateValue(this.openState);
+      this.device.open = (this.openState?true:false);
+      this.log(this.name+' - received new open '+ this.openState);
     }
-    if(oldDevice.battery_low != that.device.battery_low){
-      that.contactService.getCharacteristic(Characteristic.StatusLowBattery).updateValue(that.device.battery_low);
-      that.log(that.name+' - received new low battery state '+that.device.battery_low);
+    if(oldDevice.battery_low != this.device.battery_low){
+      this.contactService.getCharacteristic(Characteristic.StatusLowBattery).updateValue(this.device.battery_low);
+      this.log(this.name+' - received new low battery state '+this.device.battery_low);
     }
   },
   getContactSensorState: function(callback) {
