@@ -7,7 +7,7 @@ function MaxCubePlatform(log, config){
   this.config = config;
   this.wasConnected = false;
   this.paused = false;
-  this.windowsensor = config.windowsensor || true;
+  this.windowsensor = config.windowsensor === undefined ? true : config.windowsensor;
   this.myAccessories = [];
   this.myAccessories.push(new MaxCubeLinkSwitchAccessory(this.log, this.config, this));
   this.updateRate = 10000;
@@ -28,7 +28,7 @@ MaxCubePlatform.prototype = {
         that.log("Max! Cube could not be found, please restart HomeBridge with Max! Cube connected.");
         //callback(that.myAccessories);
       } else{
-        that.log("Max! Cube connection error:", error);
+        that.log("Max! Cube connection error", error);
         // inform HomeKit about connection switch state
         that.myAccessories[0].sendStatus();
         // We were already connected and got an error, it will try and reconnect on the next list update
@@ -54,8 +54,8 @@ MaxCubePlatform.prototype = {
               that.myAccessories.push(new Thermostat(that.log, that.config, device, that.cube, Service, Characteristic));
             }
           });
-          that.updateThermostatData();
           callback(that.myAccessories);
+          that.updateThermostatData();
         });
       }
     });
