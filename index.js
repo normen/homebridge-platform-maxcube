@@ -73,10 +73,10 @@ MaxCubePlatform.prototype = {
           var isWall = that.config.allow_wall_thermostat && (deviceInfo.device_type == 3);
           var deviceTypeOk = that.config.only_wall_thermostat ? (deviceInfo.device_type == 3) : (deviceInfo.device_type == 1 || deviceInfo.device_type == 2);
           if (isShutter && that.windowsensor) {
-            that.myAccessories.push(new ContactSensor(that.log, that.config, device, deviceInfo, that.cube, Service, Characteristic));
+            that.myAccessories.push(new ContactSensor(that.log, that.config, device, that.cube, Service, Characteristic));
           }
           if (deviceTypeOk || isWall) {
-            that.myAccessories.push(new Thermostat(that.log, that.config, device, deviceInfo, that.cube, Service, Characteristic));
+            that.myAccessories.push(new Thermostat(that.log, that.config, device, that.cube, Service, Characteristic));
           }
         });
         setTimeout(that.updateThermostatData.bind(that),that.updateRate);

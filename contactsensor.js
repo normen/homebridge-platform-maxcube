@@ -1,13 +1,13 @@
 var Service;
 var Characteristic;
 //{"rf_address":"181517","open":false}
-function ContactSensor(log, config, device, deviceInfo, cube, service, characteristic){
+function ContactSensor(log, config, device, cube, service, characteristic){
   Service = service;
   Characteristic = characteristic;
   this.log = log;
   this.config = config;
   this.device = device;
-  this.deviceInfo = deviceInfo;
+  this.deviceInfo = cube.getDeviceInfo(device.rf_address);
   this.cube = cube;
   this.open = this.device.open;
   this.name = this.deviceInfo.device_name + ' (' + this.deviceInfo.room_name + ')';
