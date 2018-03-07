@@ -3,6 +3,7 @@ var Thermostat = require('./thermostat');
 var ContactSensor = require('./contactsensor');
 var Service;
 var Characteristic;
+var _homebridge;
 
 function MaxCubePlatform(log, config){
   this.log = log;
@@ -48,10 +49,10 @@ MaxCubePlatform.prototype = {
             var isWall = that.config.allow_wall_thermostat && (deviceInfo.device_type == 3);
             var deviceTypeOk = that.config.only_wall_thermostat ? (deviceInfo.device_type == 3) : (deviceInfo.device_type == 1 || deviceInfo.device_type == 2);
             if (isShutter && that.windowsensor) {
-              that.myAccessories.push(new ContactSensor(that.log, that.config, device, that.cube, Service, Characteristic));
+              that.myAccessories.push(new ContactSensor(_homebridge, that, device));
             }
             if (deviceTypeOk || isWall) {
-              that.myAccessories.push(new Thermostat(that.log, that.config, device, that.cube, Service, Characteristic));
+              that.myAccessories.push(new Thermostat(_homebridge, that, device));
             }
           });
           callback(that.myAccessories);
@@ -126,5 +127,6 @@ MaxCubeLinkSwitchAccessory.prototype = {
 module.exports = function(homebridge) {
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
+  _homebridge = homebridge;
   homebridge.registerPlatform('homebridge-platform-maxcube', 'MaxCubePlatform', MaxCubePlatform);
 }

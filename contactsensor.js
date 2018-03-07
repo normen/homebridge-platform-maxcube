@@ -1,17 +1,16 @@
 var Service;
 var Characteristic;
-//{"rf_address":"181517","open":false}
-function ContactSensor(log, config, device, cube, service, characteristic){
-  Service = service;
-  Characteristic = characteristic;
-  this.log = log;
-  this.config = config;
+
+function ContactSensor(homebridge, platform, device){
+  Service = homebridge.hap.Service;
+  Characteristic = homebridge.hap.Characteristic;
+  this.log = platform.log;
+  this.config = platform.config;
+  this.cube = platform.cube;
   this.device = device;
-  this.deviceInfo = cube.getDeviceInfo(device.rf_address);
-  this.cube = cube;
+  this.deviceInfo = this.cube.getDeviceInfo(device.rf_address);
   this.open = this.device.open;
   this.name = this.deviceInfo.device_name + ' (' + this.deviceInfo.room_name + ')';
-
 
   this.informationService = new Service.AccessoryInformation();
   this.informationService

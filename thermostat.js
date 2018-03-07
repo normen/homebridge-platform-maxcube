@@ -1,47 +1,15 @@
 var Service;
 var Characteristic;
-/*
-device:
-{ rf_address: '15b389',
-  initialized: false,
-  fromCmd: false,
-  error: false,
-  valid: false,
-  mode: 'AUTO',
-  dst_active: false,
-  gateway_known: false,
-  panel_locked: false,
-  link_error: false,
-  battery_low: false,
-  valve: 0,
-  setpoint: 0,
-  temp: 0 }
-deviceInfo:
-{ device_type: 1,
-  device_name: 'Süden',
-  room_name: 'Stube',
-  room_id: 1 }
-deviceConfig:
-{ comfort_temp: 21,
-  eco_temp: 17,
-  max_setpoint_temp: 30.5,
-  min_setpoint_temp: 4.5,
-  temp_offset: 0,
-  max_valve: 100 }
-device_type 1+2 = Thermostat
-device_type 3 = Wall Thermostat (same data layout)
-device_type 4 = Window Sensor (no data except rf_address)
-device_type 5 = Eco Button (no data except rf_address)
-*/
-function Thermostat(log, config, device, cube, service, characteristic){
-  Service = service;
-  Characteristic = characteristic;
-  this.log = log;
-  this.config = config;
-  this.cube = cube;
+
+function Thermostat(homebridge, platform, device){
+  Service = homebridge.hap.Service;
+  Characteristic = homebridge.hap.Characteristic;
+  this.log = platform.log;
+  this.config = platform.config;
+  this.cube = platform.cube;
   this.device = device;
-  this.deviceInfo = cube.getDeviceInfo(device.rf_address);
-  this.deviceConfig = cube.getDeviceConfiguration(device.rf_address);
+  this.deviceInfo = this.cube.getDeviceInfo(device.rf_address);
+  this.deviceConfig = this.cube.getDeviceConfiguration(device.rf_address);
   this.lastNonZeroTemp = this.device.temp;
   this.name = this.deviceInfo.device_name + ' (' + this.deviceInfo.room_name + ')';
   this.temperatureDisplayUnits = Characteristic.TemperatureDisplayUnits.CELSIUS;
