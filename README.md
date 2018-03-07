@@ -46,25 +46,16 @@ HomeKit provides a "mode" setting for thermostat devices that allows toggling Of
 The modes mean different things for this plugin:
 
 #### Off = off temperature + manual mode
-The thermostat is set to 5 degrees. Setting manual mode prevents the Max! schedule from taking over. Setting any other mode when the thermostat is off will set the temperature to the default.
+The thermostat is set to the off temperature defined in Max!. Setting manual mode prevents the Max! schedule from taking over. Setting any other mode when the thermostat is off will set the temperature to the default.
 
-#### Heating or Cooling = manual mode
-Both set the thermostat to manual mode, the thermostat will always report "HEATING" when polled. Setting manual mode prevents the Max! schedule from taking over so it can be used to make "vacation" scenes in HomeKit.
+#### Heating = comfort temperature + manual mode
+Sets the thermostat to manual mode and automatically sets the temperature to the "comfort" temperature defined in Max!. Setting manual mode prevents the Max! schedule from taking over so it can be used to make "vacation" scenes in HomeKit.
+
+#### Cooling = eco temperature + manual mode
+Sets the thermostat to manual mode and automatically sets the temperature to the "eco" temperature defined in Max!. Setting manual mode prevents the Max! schedule from taking over so it can be used to make "vacation" scenes in HomeKit.
 
 #### Auto = auto mode
-The thermostat is in auto mode and will work as if you were controlling it by hand or the web interface. It will work off the schedule set in the Max! software and set the temperature at the programmed times.
-
-The default temperature when the thermostat is turned back on is 20 degrees. You can add a `default_temp` option to the config file to change this value. As this plugin has currently no way to access the Max! Cube schedule it can not set the temperature to the one given in the schedule.
-
-The off temperature is 5 degrees. You can add an `off_temp` option to the config file to change this value. When the thermostat is set to 5 degrees or less manually it will also report "OFF".
-
-### Wall thermostat devices
-Wall thermostat devices are by default not included in HomeKit but if you add the option `allow_wall_thermostat` to the configuration they will be added as well. They could be useful as they also supply the temperature. They will work and control the temperature of their assigned room either way.
-
-If you want to use ONLY wall thermostat devices and control everything through them you can add the option `only_wall_thermostat`.
-
-### Window sensors
-If you don't want your window sensors to appear in HomeKit (they will work even if they don't) you can add an option `windowsensor` with a value of `false` to the config file.
+The thermostat is set to auto mode. From HomeKit it will work as if you were controlling it by hand or the web interface. It will (re)set the temperature at the programmed times and otherwise keep the temperature you set.
 
 ### Using Max! software alongside HomeBridge
 If you want to use the Max! software to configure your Max! cube you have to set the switch "Max! Link" in HomeKit to off, this will disconnect HomeBridge from the Max! Cube so that the Max! software can connect instead. Set it back to on to be able to control your heating from HomeKit again.
@@ -76,8 +67,13 @@ The plugin works bidirectionally, if you change the temperature on your actual t
 
 This means that you can trigger scenes based on a certain room temperature, an opened window etc. as the change signal is broadcast in HomeKit.
 
-### AUTO mode and setting the temperature
-Just changing the temperature will keep the current mode (MANUAL/AUTO). When the thermostat is in AUTO mode and you change the temperature via HomeKit the Max! cube will set it back to the planned temperature on the next planned temperature change.
+### Wall thermostat devices
+Wall thermostat devices are by default not included in HomeKit but if you add the option `allow_wall_thermostat` to the configuration they will be added as well. They could be useful as they also supply the temperature. They will work and control the temperature of their assigned room either way.
+
+If you want to use ONLY wall thermostat devices and control everything through them you can add the option `only_wall_thermostat`.
+
+### Window sensors
+If you don't want your window sensors to appear in HomeKit (they will work even if they don't) you can add an option `windowsensor` with a value of `false` to the config file.
 
 ### Overview of optional parameters
 ```
@@ -88,9 +84,7 @@ Just changing the temperature will keep the current mode (MANUAL/AUTO). When the
   "port": 62910,
   "windowsensor": false,
   "allow_wall_thermostat": true,
-  "only_wall_thermostat": true,
-  "default_temp": 22,
-  "off_temp": 5
+  "only_wall_thermostat": true
 }
 ```
 

@@ -1,6 +1,8 @@
 var MaxCube = require('maxcube2');
 var Thermostat = require('./thermostat');
 var ContactSensor = require('./contactsensor');
+var Service;
+var Characteristic;
 
 function MaxCubePlatform(log, config){
   this.log = log;
@@ -16,10 +18,8 @@ function MaxCubePlatform(log, config){
 };
 MaxCubePlatform.prototype = {
   accessories: function(callback) {
-    if(this.cube) return;
     var that = this;
     this.startCube();
-
     this.cube.on('error', function (error) {
       if(!that.wasConnected){
         // We didn't connect yet and got an error,
@@ -122,13 +122,6 @@ MaxCubeLinkSwitchAccessory.prototype = {
     this.service.getCharacteristic(Characteristic.On).updateValue(this.cubePlatform.cube.initialised);
   }
 }
-
-function isNull(object) {
-    return object == undefined || null;
-}
-
-var Service;
-var Characteristic;
 
 module.exports = function(homebridge) {
   Service = homebridge.hap.Service;

@@ -45,11 +45,12 @@ function Thermostat(log, config, device, cube, service, characteristic){
   this.lastNonZeroTemp = this.device.temp;
   this.name = this.deviceInfo.device_name + ' (' + this.deviceInfo.room_name + ')';
   this.temperatureDisplayUnits = Characteristic.TemperatureDisplayUnits.CELSIUS;
-  this.defaultTemp = this.deviceConfig.comfort_temp || 20;
+  this.comfortTemp = this.deviceConfig.comfort_temp || 20;
+  this.ecoTemp = this.deviceConfig.eco_temp || 17;
   this.offTemp = this.deviceConfig.min_setpoint_temp || 5;
   this.maxTemp = this.deviceConfig.max_setpoint_temp || 30;
   this.sendFault = false;
-  if(this.device.mode == "AUTO"){
+  if(this.device.mode == 'AUTO'){
     this.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
   } else {
     this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
@@ -110,32 +111,16 @@ Thermostat.prototype = {
     if(!device) {
       return;
     }
-
     this.deviceInfo = that.cube.getDeviceInfo(device.rf_address);
     this.deviceConfig = that.cube.getDeviceConfiguration(device.rf_address);
-
     var oldDevice = that.device;
     that.device = device;
-    if(that.device.mode == "AUTO"){
-      that.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
-    } else {
-      that.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
-    }
-    if(that.device.setpoint <= that.offTemp){
-      that.coolingState = Characteristic.TargetHeatingCoolingState.OFF;
-    }
+    this.checkHeatingCoolingState();
     if(that.device.temp != 0){
       that.lastNonZeroTemp = that.device.temp;
     }
-    that.publishNewData(oldDevice);
-  },
-  publishNewData: function(oldDevice){
     // publish changes in data so events can be triggered by data changes
     var that = this;
-    if(oldDevice.mode != that.device.mode){
-      that.thermostatService.getCharacteristic(Characteristic.TargetHeatingCoolingState).updateValue(that.coolingState);
-      that.log(that.name+' - received new target mode '+that.device.mode);
-    }
     if(oldDevice.battery_low != that.device.battery_low){
       that.thermostatService.getCharacteristic(Characteristic.StatusLowBattery).updateValue(that.device.battery_low);
       that.log(that.name+' - received new low battery state '+that.device.battery_low);
@@ -153,9 +138,21 @@ Thermostat.prototype = {
       that.log(that.name+' - received new error state');
     }
   },
+  checkHeatingCoolingState: function(){
+    let oldCoolingState = this.coolingState;
+    if(this.device.mode == 'MANUAL'){
+      let isEco = this.device.setpoint == this.ecoTemp;
+      if(isEco) this.coolingState = Characteristic.TargetHeatingCoolingState.COOL;
+      else this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
+    }
+    if(oldCoolingState != this.coolingState){
+      that.log(that.name+' - received new target mode '+that.device.mode);
+      this.thermostatService.getCharacteristic(Characteristic.TargetHeatingCoolingState).updateValue(this.coolingState);
+    }
+  },
   getCurrentHeatingCoolingState: function(callback) {
+    this.checkHeatingCoolingState();
     if(this.coolingState == Characteristic.TargetHeatingCoolingState.AUTO){
-      //current state can't be "AUTO"
       callback(null, Characteristic.TargetHeatingCoolingState.HEAT);
     }
     else {
@@ -163,11 +160,12 @@ Thermostat.prototype = {
     }
   },
   getTargetHeatingCoolingState: function(callback) {
+    this.checkHeatingCoolingState();
     callback(null, this.coolingState);
   },
   setTargetHeatingCoolingState: function(value, callback) {
     var that = this;
-    var targetCoolingState = 'MANUAL';
+    var targetMode = 'MANUAL';
     var targetTemp = that.device.setpoint;
     if(value == Characteristic.TargetHeatingCoolingState.OFF) {
       this.coolingState = value;
@@ -176,47 +174,29 @@ Thermostat.prototype = {
     }
     else if(value == Characteristic.TargetHeatingCoolingState.HEAT) {
       this.coolingState = value;
-      if(targetTemp <= this.offTemp){
-        targetTemp = this.defaultTemp;
-        that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
-      }
+      targetTemp = this.comfortTemp;
+      that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
     }
     else if(value == Characteristic.TargetHeatingCoolingState.COOL) {
-      this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
-      if(targetTemp <= this.offTemp){
-        targetTemp = this.defaultTemp;
-        that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
-      }
+      this.coolingState = value;
+      targetTemp = this.ecoTemp;
+      that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
     }
     else if(value == Characteristic.TargetHeatingCoolingState.AUTO) {
       this.coolingState = value;
-      if(targetTemp <= this.offTemp){
-        targetTemp = this.defaultTemp;
-        that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
-      }
-      targetCoolingState = 'AUTO';
+      targetTemp = this.comfortTemp;
+      that.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
+      targetMode = 'AUTO';
     } else {
       that.log("Unknown HeatingCoolingState value");
     }
-    this.device.mode = targetCoolingState;
+    this.device.mode = targetMode;
     this.device.setpoint = targetTemp;
-    if(this.cube) try{
-      this.cube.getConnection().then(function () {
-        that.log(that.name+' - setting mode '+targetCoolingState+' at temperature '+targetTemp);
-        try{
-          that.cube.setTemperature(that.device.rf_address, Math.round(targetTemp), targetCoolingState);
-          that.sendFault = false;
-        }
-        catch(err){
-          that.log("Error sending data to Max! Cube: "+ err);
-          that.sendFault = true;
-        }
-      }, function(){that.sendFault = true});
-    }
-    catch(err){
-      that.log("Error sending data to Max! Cube: "+ err);
-      that.sendFault = true;
-    }
+    this.cube.getConnection().then(function () {
+      that.log(that.name+' - setting mode '+targetMode+' at temperature '+targetTemp);
+      that.cube.setTemperature(that.device.rf_address, targetTemp, targetMode);
+      that.sendFault = false;
+    }, function(){that.sendFault = true});
     callback(null, this.coolingState);
   },
   getCurrentTemperature: function(callback) {

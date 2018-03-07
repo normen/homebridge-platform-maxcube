@@ -46,9 +46,6 @@ ContactSensor.prototype = {
     else {
       that.openState = Characteristic.ContactSensorState.CONTACT_DETECTED;
     }
-    that.publishNewData(oldDevice);
-  },
-  publishNewData: function(oldDevice){
     // publish changes in data so events can be triggered by data changes
     var that = this;
     if(oldDevice.open != that.openState){
@@ -60,7 +57,6 @@ ContactSensor.prototype = {
       that.contactService.getCharacteristic(Characteristic.StatusLowBattery).updateValue(that.device.battery_low);
       that.log(that.name+' - received new low battery state '+that.device.battery_low);
     }
-
   },
   getContactSensorState: function(callback) {
     callback(null, this.device.open);
