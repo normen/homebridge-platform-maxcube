@@ -117,7 +117,7 @@ Thermostat.prototype = {
       this.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
     }
     if(oldCoolingState != this.coolingState){
-      this.log(this.name+' - received new target mode '+this.device.mode);
+      this.log(this.name+' - computed new target mode '+this.coolingState);
       this.thermostatService.getCharacteristic(Characteristic.TargetHeatingCoolingState).updateValue(this.coolingState);
     }
   },
