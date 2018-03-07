@@ -18,14 +18,8 @@ function Thermostat(homebridge, platform, device){
   this.offTemp = this.deviceConfig.min_setpoint_temp || 5;
   this.maxTemp = this.deviceConfig.max_setpoint_temp || 30;
   this.sendFault = false;
-  if(this.device.mode == 'AUTO'){
-    this.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
-  } else {
-    this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
-  }
-  if(this.device.setpoint <= this.offTemp){
-    this.coolingState = Characteristic.TargetHeatingCoolingState.OFF;
-  }
+
+  this.checkHeatingCoolingState();
 
   this.informationService = new Service.AccessoryInformation();
   this.informationService
@@ -116,7 +110,8 @@ Thermostat.prototype = {
     }else{
       this.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
     }
-    if(oldCoolingState != this.coolingState){
+    //only send change notification when we already computed state once
+    if(oldCoolingState !== undefined && oldCoolingState != this.coolingState){
       this.log(this.name+' - computed new target mode '+this.coolingState);
       this.thermostatService.getCharacteristic(Characteristic.TargetHeatingCoolingState).updateValue(this.coolingState);
     }
