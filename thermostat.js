@@ -143,11 +143,17 @@ Thermostat.prototype = {
       targetTemp = this.offTemp;
     }
     else if(value == Characteristic.TargetHeatingCoolingState.HEAT) {
+      if(targetTemp == this.offTemp){
+        targetTemp = this.comfortTemp;
+      }
     }
     else if(value == Characteristic.TargetHeatingCoolingState.COOL) {
       targetTemp = this.ecoTemp;
     }
     else if(value == Characteristic.TargetHeatingCoolingState.AUTO) {
+      if(targetTemp == this.offTemp){
+        targetTemp = this.comfortTemp;
+      }
       targetMode = 'AUTO';
     }
     this.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
