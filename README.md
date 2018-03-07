@@ -86,9 +86,9 @@ To create the "eco" scene do the following:
 - Select all thermostats
 - Save the scene with a name like "Heating Eco"
 
-The scene will automatically include all thermostats with the mode set to off and the temperature set to the eco temperature. To create a "comfort" temperature do the same in reverse, enable your comfort setting and then create a scene "Heating Comfort".
+The scene will automatically include all thermostats with the mode set to off and the temperature set to the eco temperature. To create a "comfort" temperature do the same thing, enable your comfort setting and then create a scene "Heating Comfort" with all thermostats selected.
 
-Because HomeKit keeps track of the state of the thermostats you cam press the eco button and the scene will light up. When you change a thermostat it will turn off. Same for the "comfort temperature" scene.
+Because HomeKit keeps track of the state of the thermostats you can press the eco button and the scene will light up. When you change a thermostat it will turn off. Same for the "comfort temperature" scene.
 
 Conversely, calling the scene is exactly the same as pressing the eco button so you can for example set a trigger for the scene to start "when the last person leaves home".
 

@@ -33,7 +33,7 @@ function ContactSensor(log, config, device, cube, service, characteristic){
 
 ContactSensor.prototype = {
   refreshDevice: function(devices){
-    var that = this;
+    let that = this;
     let device = devices.filter(function(item) { return item.rf_address === that.device.rf_address; })[0];
     if(!device) {
       return;
@@ -47,7 +47,6 @@ ContactSensor.prototype = {
       that.openState = Characteristic.ContactSensorState.CONTACT_DETECTED;
     }
     // publish changes in data so events can be triggered by data changes
-    var that = this;
     if(oldDevice.open != that.openState){
       that.contactService.getCharacteristic(Characteristic.ContactSensorState).updateValue(that.openState);
       that.device.open = (that.openState?true:false);

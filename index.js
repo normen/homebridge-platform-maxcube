@@ -18,7 +18,7 @@ function MaxCubePlatform(log, config){
 };
 MaxCubePlatform.prototype = {
   accessories: function(callback) {
-    var that = this;
+    let that = this;
     this.startCube();
     this.cube.on('error', function (error) {
       if(!that.wasConnected){
@@ -79,7 +79,7 @@ MaxCubePlatform.prototype = {
   updateThermostatData: function(){
     // called periodically to trigger maxcube data update
     setTimeout(this.updateThermostatData.bind(this),this.updateRate);
-    var that = this;
+    let that = this;
     if(!this.paused) this.cube.getConnection().then(function () {
       that.cube.updateDeviceStatus();
     });

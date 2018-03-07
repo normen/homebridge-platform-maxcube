@@ -106,7 +106,7 @@ function Thermostat(log, config, device, cube, service, characteristic){
 
 Thermostat.prototype = {
   refreshDevice: function(devices){
-    var that = this;
+    let that = this;
     let device = devices.filter(function(item) { return item.rf_address === that.device.rf_address; })[0];
     if(!device) {
       return;
@@ -120,7 +120,6 @@ Thermostat.prototype = {
       that.lastNonZeroTemp = that.device.temp;
     }
     // publish changes in data so events can be triggered by data changes
-    var that = this;
     if(oldDevice.battery_low != that.device.battery_low){
       that.thermostatService.getCharacteristic(Characteristic.StatusLowBattery).updateValue(that.device.battery_low);
       that.log(that.name+' - received new low battery state '+that.device.battery_low);
@@ -168,7 +167,7 @@ Thermostat.prototype = {
     callback(null, this.coolingState);
   },
   setTargetHeatingCoolingState: function(value, callback) {
-    var that = this;
+    let that = this;
     var targetMode = 'MANUAL';
     var targetTemp = that.device.setpoint;
     if(value == Characteristic.TargetHeatingCoolingState.OFF) {
@@ -210,7 +209,7 @@ Thermostat.prototype = {
     callback(null, this.device.setpoint);
   },
   setTargetTemperature: function(value, callback) {
-    var that = this;
+    let that = this;
     this.device.setpoint = value;
     if(this.cube) this.cube.getConnection().then(function () {
       that.log(that.name+' - setting temperature '+ value);
