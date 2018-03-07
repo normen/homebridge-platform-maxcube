@@ -100,70 +100,66 @@ Thermostat.prototype = {
     }
   },
   checkHeatingCoolingState: function(){
-    let oldCoolingState = this.coolingState;
+    let oldCoolingState = this.targetHeatingCoolingState;
     if(this.device.mode == 'MANUAL'){
       let isEco = this.device.setpoint == this.ecoTemp;
       let isOff = this.device.setpoint == this.offTemp;
-      if(isOff) this.coolingState = Characteristic.TargetHeatingCoolingState.OFF;
-      else if(isEco) this.coolingState = Characteristic.TargetHeatingCoolingState.COOL;
-      else this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
+      if(isOff) this.targetHeatingCoolingState = Characteristic.TargetHeatingCoolingState.OFF;
+      else if(isEco) this.targetHeatingCoolingState = Characteristic.TargetHeatingCoolingState.COOL;
+      else this.targetHeatingCoolingState = Characteristic.TargetHeatingCoolingState.HEAT;
     }else{
-      this.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
+      this.targetHeatingCoolingState = Characteristic.TargetHeatingCoolingState.AUTO;
     }
     //only send change notification when we already computed state once
-    if(oldCoolingState !== undefined && oldCoolingState != this.coolingState){
-      this.log(this.name+' - computed new target mode '+this.coolingState);
-      this.thermostatService.getCharacteristic(Characteristic.TargetHeatingCoolingState).updateValue(this.coolingState);
+    if(oldCoolingState !== undefined && oldCoolingState != this.targetHeatingCoolingState){
+      this.log(this.name+' - computed new target mode '+this.targetHeatingCoolingState);
+      this.thermostatService.getCharacteristic(Characteristic.TargetHeatingCoolingState).updateValue(this.targetHeatingCoolingState);
+      this.thermostatService.getCharacteristic(Characteristic.CurrentHeatingCoolingState).updateValue(this.currentHeatingCoolingState());
     }
+    return this.targetHeatingCoolingState;
   },
   getCurrentHeatingCoolingState: function(callback) {
     this.checkHeatingCoolingState();
-    if(this.coolingState == Characteristic.TargetHeatingCoolingState.AUTO){
-      callback(null, Characteristic.TargetHeatingCoolingState.HEAT);
+    callback(null, this.currentHeatingCoolingState());
+  },
+  currentHeatingCoolingState: function(){
+    if(this.targetHeatingCoolingState == Characteristic.TargetHeatingCoolingState.AUTO){
+      return Characteristic.TargetHeatingCoolingState.HEAT;
     }
     else {
-      callback(null, this.coolingState);
+      return this.targetHeatingCoolingState;
     }
   },
   getTargetHeatingCoolingState: function(callback) {
     this.checkHeatingCoolingState();
-    callback(null, this.coolingState);
+    callback(null, this.targetHeatingCoolingState);
   },
   setTargetHeatingCoolingState: function(value, callback) {
     let that = this;
     var targetMode = 'MANUAL';
     var targetTemp = this.device.setpoint;
+    this.targetHeatingCoolingState = value;
     if(value == Characteristic.TargetHeatingCoolingState.OFF) {
-      this.coolingState = value;
       targetTemp = this.offTemp;
-      this.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
     }
     else if(value == Characteristic.TargetHeatingCoolingState.HEAT) {
-      this.coolingState = value;
-      targetTemp = this.comfortTemp;
-      this.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
     }
     else if(value == Characteristic.TargetHeatingCoolingState.COOL) {
-      this.coolingState = value;
       targetTemp = this.ecoTemp;
-      this.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
     }
     else if(value == Characteristic.TargetHeatingCoolingState.AUTO) {
-      this.coolingState = value;
-      targetTemp = this.comfortTemp;
-      this.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
       targetMode = 'AUTO';
-    } else {
-      this.log("Unknown HeatingCoolingState value");
     }
+    this.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(targetTemp);
     this.device.mode = targetMode;
     this.device.setpoint = targetTemp;
+    this.checkHeatingCoolingState();
     this.cube.getConnection().then(function () {
       that.log(that.name+' - setting mode '+targetMode+' at temperature '+targetTemp);
       that.cube.setTemperature(that.device.rf_address, targetTemp, targetMode);
       that.sendFault = false;
     }, function(){that.sendFault = true});
-    callback(null, this.coolingState);
+    callback(null, this.targetHeatingCoolingState);
   },
   getCurrentTemperature: function(callback) {
     callback(null, this.lastNonZeroTemp);

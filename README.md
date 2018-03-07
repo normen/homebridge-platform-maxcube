@@ -41,14 +41,14 @@ All devices you have connected are automatically fetched from your MaxCube
 ## Additional Notes
 
 ### Heating/Cooling Mode
-HomeKit provides a "mode" setting for thermostat devices that allows toggling Off/Heating/Cooling/Auto. This setting is used by this plugin to switch between the "Auto" and "Manual" modes of Max! thermostat devices or to turn them off (e.g. via Siri command).
+HomeKit provides a "mode" setting for thermostat devices that allows toggling Off/Heating/Cooling/Auto. This setting is used by this plugin to switch between the "Auto" and "Manual" modes of Max! thermostat devices or to turn them off (e.g. via Siri command). The mode setting works bidirectionally, if you enable any of the modes on your thermostat device HomeKit will show it accordingly.
 
-The modes mean different things for this plugin:
+The modes mean different things in HomeKit the Max! Cube:
 
 #### Off = off temperature + manual mode
 The thermostat is set to the off temperature defined in Max!. Setting manual mode prevents the Max! schedule from taking over. Setting any other mode when the thermostat is off will set the temperature to the default.
 
-#### Heating = comfort temperature + manual mode
+#### Heating = manual mode
 Sets the thermostat to manual mode and automatically sets the temperature to the "comfort" temperature defined in Max!. Setting manual mode prevents the Max! schedule from taking over so it can be used to make "vacation" scenes in HomeKit.
 
 #### Cooling = eco temperature + manual mode
@@ -72,9 +72,6 @@ Wall thermostat devices are by default not included in HomeKit but if you add th
 
 If you want to use ONLY wall thermostat devices and control everything through them you can add the option `only_wall_thermostat`.
 
-### Window sensors
-If you don't want your window sensors to appear in HomeKit (they will work even if they don't) you can add an option `windowsensor` with a value of `false` to the config file.
-
 ### Eco Button
 Eco buttons are not included in HomeKit as there isn't really a global "Eco" function in the Max! Cube. What happens when the Eco button is pressed is that all devices are set to their specific eco temperature separately and then set to manual mode so they don't change anymore.
 
@@ -91,6 +88,9 @@ The scene will automatically include all thermostats with the mode set to off an
 Because HomeKit keeps track of the state of the thermostats you can press the eco button and the scene will light up. When you change a thermostat it will turn off. Same for the "comfort temperature" scene.
 
 Conversely, calling the scene is exactly the same as pressing the eco button so you can for example set a trigger for the scene to start "when the last person leaves home".
+
+### Window sensors
+If you don't want your window sensors to appear in HomeKit (they will work even if they don't) you can add an option `windowsensor` with a value of `false` to the config file.
 
 ### Overview of optional parameters
 ```
