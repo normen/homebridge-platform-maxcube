@@ -46,7 +46,7 @@ function Thermostat(homebridge, platform, device){
     .setProps({
       minValue: this.offTemp,
       maxValue: this.maxTemp,
-      minStep: 1
+      minStep: 0.5
     })
     .on('get', this.getTargetTemperature.bind(this))
     .on('set', this.setTargetTemperature.bind(this));
