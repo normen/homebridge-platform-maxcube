@@ -75,6 +75,23 @@ If you want to use ONLY wall thermostat devices and control everything through t
 ### Window sensors
 If you don't want your window sensors to appear in HomeKit (they will work even if they don't) you can add an option `windowsensor` with a value of `false` to the config file.
 
+### Eco Button
+Eco buttons are not included in HomeKit as there isn't really a global "Eco" function in the Max! Cube. What happens when the Eco button is pressed is that all devices are set to their specific eco temperature separately and then set to manual mode so they don't change anymore.
+
+This can be emulated in HomeKit by a scene much better than by any button this plugin could provide.
+
+To create the "eco" scene do the following:
+- Press the physical eco button in your home
+- Make a new scene in HomeKit
+- Select all thermostats
+- Save the scene with a name like "Heating Eco"
+
+The scene will automatically include all thermostats with the mode set to off and the temperature set to the eco temperature. To create a "comfort" temperature do the same in reverse, enable your comfort setting and then create a scene "Heating Comfort".
+
+Because HomeKit keeps track of the state of the thermostats you cam press the eco button and the scene will light up. When you change a thermostat it will turn off. Same for the "comfort temperature" scene.
+
+Conversely, calling the scene is exactly the same as pressing the eco button so you can for example set a trigger for the scene to start "when the last person leaves home".
+
 ### Overview of optional parameters
 ```
 {

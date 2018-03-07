@@ -142,8 +142,12 @@ Thermostat.prototype = {
     let oldCoolingState = this.coolingState;
     if(this.device.mode == 'MANUAL'){
       let isEco = this.device.setpoint == this.ecoTemp;
-      if(isEco) this.coolingState = Characteristic.TargetHeatingCoolingState.COOL;
+      let isOff = this.device.setpoint == this.offTemp;
+      if(isOff) this.coolingState = Characteristic.TargetHeatingCoolingState.OFF;
+      else if(isEco) this.coolingState = Characteristic.TargetHeatingCoolingState.COOL;
       else this.coolingState = Characteristic.TargetHeatingCoolingState.HEAT;
+    }else{
+      this.coolingState = Characteristic.TargetHeatingCoolingState.AUTO;
     }
     if(oldCoolingState != this.coolingState){
       that.log(that.name+' - received new target mode '+that.device.mode);
