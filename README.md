@@ -129,9 +129,13 @@ The plugin will report errors from the Max! Cube library to HomeKit but they are
 ### Version History
 
 #### v1.1.0
-- Reads default values from Max! settings
+- Reads default values (off/eco/comfort) from Max! settings
 - Allow toggling off/eco/manual/auto via HomeKit mode
+- Allows changing temperature in 0.5deg steps
+- Auto-connects when changing values with Max! Link off
+- Fix values "flipping back" while changing them
 - Cleanup handling of cube connection with new maxcube2 library
+- General code cleanups & README updates
 
 #### v1.0.0
 - First full-feature release
