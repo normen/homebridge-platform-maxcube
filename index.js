@@ -28,14 +28,18 @@ MaxCubePlatform.prototype = {
         that.log("Max! Cube could not be found, please restart HomeBridge with Max! Cube connected.");
         //callback(that.myAccessories);
       } else{
-        that.log("Max! Cube connection error", error);
+        that.log("Max! Cube connection error!");
         // inform HomeKit about connection switch state
         that.myAccessories[0].sendStatus();
         // We were already connected and got an error, it will try and reconnect on the next list update
       }
     });
+    this.cube.on('closed', function () {
+      that.log("Max! Cube connection closed.");
+      that.myAccessories[0].sendStatus();
+    });
     this.cube.on('connected', function () {
-      that.log("Connected to Max! Cube..");
+      that.log("Connected to Max! Cube.");
       // inform HomeKit about connection switch state
       that.myAccessories[0].sendStatus();
       if(!that.wasConnected){
@@ -72,8 +76,7 @@ MaxCubePlatform.prototype = {
     this.log("Closing connection to Max! Cube..");
     this.paused = true;
     if(this.cube){
-      try{this.cube.close()}catch(error){}
-      this.myAccessories[0].sendStatus();
+      try{this.cube.close()}catch(error){console.error(error)}
     }
   },
   updateThermostatData: function(){
