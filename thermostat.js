@@ -17,7 +17,9 @@ function Thermostat(homebridge, platform, device){
   this.ecoTemp = this.deviceConfig.eco_temp || 17;
   this.offTemp = this.deviceConfig.min_setpoint_temp || 5;
   this.maxTemp = this.deviceConfig.max_setpoint_temp || 30;
+  this.inputOutputTimeout = 5000;
   this.sendFault = false;
+  this.lastManualChange = new Date(0);
 
   this.checkHeatingCoolingState();
 
@@ -70,9 +72,9 @@ Thermostat.prototype = {
   refreshDevice: function(devices){
     let that = this;
     let device = devices.filter(function(item) { return item.rf_address === that.device.rf_address; })[0];
-    if(!device) {
-      return;
-    }
+    if(!device) return;
+    //avoid the update resetting values that were just entered by the user and not yet acknowledged by the cube
+    if((new Date() - this.lastManualChange) < this.inputOutputTimeout) return;
     this.deviceInfo = this.cube.getDeviceInfo(device.rf_address);
     this.deviceConfig = this.cube.getDeviceConfiguration(device.rf_address);
     var oldDevice = this.device;
@@ -135,6 +137,7 @@ Thermostat.prototype = {
     callback(null, this.targetHeatingCoolingState);
   },
   setTargetHeatingCoolingState: function(value, callback) {
+    this.lastManualChange = new Date();
     let that = this;
     var targetMode = 'MANUAL';
     var targetTemp = this.device.setpoint;
@@ -174,6 +177,7 @@ Thermostat.prototype = {
     callback(null, this.device.setpoint);
   },
   setTargetTemperature: function(value, callback) {
+    this.lastManualChange = new Date();
     let that = this;
     this.device.setpoint = value;
     if(this.cube) this.cube.getConnection().then(function () {
