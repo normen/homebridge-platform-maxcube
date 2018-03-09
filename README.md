@@ -81,9 +81,9 @@ This can be emulated in HomeKit by a scene much better than by any button this p
 
 To create the "eco" scene do the following:
 1. Press the physical eco button in your home
-- Make a new scene in HomeKit
-- Select all thermostats
-- Save the scene with a name like "Heating Eco"
+2. Make a new scene in HomeKit
+3. Select all thermostats
+4. Save the scene with a name like "Heating Eco"
 
 The scene will automatically include all thermostats with the mode set to cooling and the temperature set to the eco temperature. To create a "comfort" temperature do the same thing, enable your comfort setting and then create a scene "Heating Comfort" with all thermostats selected.
 
@@ -93,9 +93,9 @@ Conversely, calling the scene is _exactly the same_ as pressing the eco button s
 
 If you change your eco default values in the Max! Cube you will have to update the scene as well. To avoid messing up your HomeKit automation, keep the scene and just re-add the thermostat devices.
 1. Press the physical eco button in your home again
-- Edit the existing scene in HomeKit
-- Remove all thermostats from the scene
-- Add them again, they will again save the current eco temperature
+2. Edit the existing scene in HomeKit
+3. Remove all thermostats from the scene
+4. Add them again, they will again save the current eco temperature
 
 ### Window sensors
 If you don't want your window sensors to appear in HomeKit (they will work even if they don't) you can add an option `windowsensor` with a value of `false` to the config file.
