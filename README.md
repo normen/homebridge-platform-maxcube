@@ -80,16 +80,22 @@ Eco buttons are not included in HomeKit as there isn't really a global "Eco" fun
 This can be emulated in HomeKit by a scene much better than by any button this plugin could provide.
 
 To create the "eco" scene do the following:
-- Press the physical eco button in your home
+1. Press the physical eco button in your home
 - Make a new scene in HomeKit
 - Select all thermostats
 - Save the scene with a name like "Heating Eco"
 
-The scene will automatically include all thermostats with the mode set to off and the temperature set to the eco temperature. To create a "comfort" temperature do the same thing, enable your comfort setting and then create a scene "Heating Comfort" with all thermostats selected.
+The scene will automatically include all thermostats with the mode set to cooling and the temperature set to the eco temperature. To create a "comfort" temperature do the same thing, enable your comfort setting and then create a scene "Heating Comfort" with all thermostats selected.
 
 Because HomeKit keeps track of the state of the thermostats you can press the eco button and the scene will light up. When you change a thermostat it will turn off. Same for the "comfort temperature" scene.
 
-Conversely, calling the scene is exactly the same as pressing the eco button so you can for example set a trigger for the scene to start "when the last person leaves home".
+Conversely, calling the scene is _exactly the same_ as pressing the eco button so you can for example set a trigger for the scene to start "when the last person leaves home".
+
+If you change your eco default values in the Max! Cube you will have to update the scene as well. To avoid messing up your HomeKit automation, keep the scene and just re-add the thermostat devices.
+1. Press the physical eco button in your home again
+- Edit the existing scene in HomeKit
+- Remove all thermostats from the scene
+- Add them again, they will again save the current eco temperature
 
 ### Window sensors
 If you don't want your window sensors to appear in HomeKit (they will work even if they don't) you can add an option `windowsensor` with a value of `false` to the config file.
