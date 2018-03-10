@@ -19,7 +19,7 @@ function MaxCubePlatform(log, config){
 MaxCubePlatform.prototype = {
   accessories: function(callback) {
     let that = this;
-    this.startCube();
+    this.cube = new MaxCube(this.config.ip, this.config.port);
     this.cube.on('error', function (error) {
       if(!that.wasConnected){
         // We didn't connect yet and got an error,
@@ -65,12 +65,10 @@ MaxCubePlatform.prototype = {
         });
       }
     });
+    this.startCube();
   },
   startCube: function(){
     this.log("Try connecting to Max! Cube..");
-    if(!this.cube){
-      this.cube = new MaxCube(this.config.ip, this.config.port);
-    }
     this.cube.getConnection();
   },
   stopCube: function(){
