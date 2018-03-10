@@ -35,10 +35,12 @@ MaxCubePlatform.prototype = {
       }
     });
     this.cube.on('closed', function () {
+      that.paused = true;
       that.log("Max! Cube connection closed.");
       that.myAccessories[0].sendStatus();
     });
     this.cube.on('connected', function () {
+      that.paused = false;
       that.log("Connected to Max! Cube.");
       // inform HomeKit about connection switch state
       that.myAccessories[0].sendStatus();
@@ -66,7 +68,6 @@ MaxCubePlatform.prototype = {
   },
   startCube: function(){
     this.log("Try connecting to Max! Cube..");
-    this.paused = false;
     if(!this.cube){
       this.cube = new MaxCube(this.config.ip, this.config.port);
     }
@@ -74,7 +75,6 @@ MaxCubePlatform.prototype = {
   },
   stopCube: function(){
     this.log("Closing connection to Max! Cube..");
-    this.paused = true;
     if(this.cube){
       try{this.cube.close()}catch(error){console.error(error)}
     }
