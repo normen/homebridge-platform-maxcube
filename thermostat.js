@@ -17,7 +17,7 @@ function Thermostat(homebridge, platform, device){
   this.ecoTemp = this.deviceConfig.eco_temp || 17;
   this.offTemp = this.deviceConfig.min_setpoint_temp || 5;
   this.maxTemp = this.deviceConfig.max_setpoint_temp || 30;
-  this.inputOutputTimeout = 5000;
+  this.inputOutputTimeout = 10000;
   this.sendFault = false;
   this.lastManualChange = new Date(0);
 
