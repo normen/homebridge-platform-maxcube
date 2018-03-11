@@ -163,7 +163,12 @@ Thermostat.prototype = {
     this.device.mode = targetMode;
     this.device.setpoint = targetTemp;
     this.checkHeatingCoolingState();
+    let errorStatus = that.errorStatus();
     this.cube.getConnection().then(function () {
+      if(errorStatus != 0){
+        that.log(that.name+' has error state '+ errorStatus + ' - sending error reset to cube');
+        that.cube.resetCubeError();
+      }
       that.log(that.name+' - setting mode '+targetMode+' at temperature '+targetTemp);
       that.cube.setTemperature(that.device.rf_address, targetTemp, targetMode);
       that.sendFault = false;
@@ -180,7 +185,12 @@ Thermostat.prototype = {
     this.lastManualChange = new Date();
     let that = this;
     this.device.setpoint = value;
+    let errorStatus = this.errorStatus();
     if(this.cube) this.cube.getConnection().then(function () {
+      if(errorStatus != 0){
+        that.log(that.name+' has error state '+ errorStatus + ' - sending error reset to cube');
+        that.cube.resetCubeError();
+      }
       that.log(that.name+' - setting temperature '+ value);
       that.cube.setTemperature(that.device.rf_address, value, that.device.mode);
       that.sendFault = false;
