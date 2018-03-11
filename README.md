@@ -128,7 +128,7 @@ The plugin will report errors from the Max! Cube library to HomeKit but they are
 
 ### Version History
 
-#### v1.1.1
+#### v1.1.2
 - Reset max cube errors so that thermostat devices react again after max cube rf errors
 
 #### v1.1.0
