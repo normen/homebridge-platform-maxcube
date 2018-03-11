@@ -128,6 +128,9 @@ The plugin will report errors from the Max! Cube library to HomeKit but they are
 
 ### Version History
 
+#### v1.1.1
+- Reset max cube errors so that thermostat devices react again after max cube rf errors
+
 #### v1.1.0
 - Reads default values (off/eco/comfort) from Max! settings
 - Allow toggling off/eco/manual/auto via HomeKit mode
