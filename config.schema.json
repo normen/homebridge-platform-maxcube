@@ -1,0 +1,24 @@
+{
+  "pluginAlias": "MaxCubePlatform",
+  "pluginType": "platform",
+  "footerDisplay": "For documentation please see the https://github.com/normen/homebridge-platform-maxcube",
+  "schema": {
+    "name": {
+      "title": "Name",
+      "default": "MaxCube Platform",
+      "type": "string",
+      "required": true
+    },
+    "ip": {
+      "title": "IP / Hostname",
+      "type": "string",
+      "required": true
+    },
+    "port": {
+      "title": "Port",
+      "type": "number",
+      "default": 62910,
+      "required": true
+    }
+  }
+}

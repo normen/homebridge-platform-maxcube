@@ -1,6 +1,6 @@
 {
   "name": "homebridge-platform-maxcube",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "eq3 Max! Cube plugin for Homebridge",
   "author": "Normen Hansen",
   "contributors": [
