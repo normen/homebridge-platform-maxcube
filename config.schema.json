@@ -19,6 +19,27 @@
       "type": "number",
       "default": 62910,
       "required": true
+    },
+    "windowsensor": {
+      "title": "Show Window Sensors",
+      "description": "Show window sensors as contact sensors in HomeKit",
+      "type": "boolean",
+      "default": true,
+      "required": false
+    },
+    "allow_wall_thermostat": {
+      "title": "Show Wall Thermostats",
+      "description": "By default wall thermostats are not shown in HomeKit",
+      "type": "boolean",
+      "default": false,
+      "required": false
+    },
+    "only_wall_thermostat": {
+      "title": "Show Only Wall Thermostats",
+      "description": "Set this if you only want to control wall thermostats in HomeKit",
+      "type": "boolean",
+      "default": false,
+      "required": false
     }
   }
 }
