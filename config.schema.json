@@ -6,12 +6,15 @@
     "name": {
       "title": "Name",
       "default": "MaxCube Platform",
+      "description": "The name of this plugin as it appears in the homebridge log",
       "type": "string",
       "required": true
     },
     "ip": {
       "title": "IP / Hostname",
       "type": "string",
+      "description": "The IP or hostname of your Max! Cube, find and/or set it through your router",
+      "placeholder": "192.168.1.90",
       "required": true
     },
     "port": {

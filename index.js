@@ -6,27 +6,29 @@ var _homebridge;
 
 function MaxCubePlatform(log, config, api){
   const self = this;
+  this.api = api;
   this.log = log;
   this.config = config;
   this.paused = false;
   this.windowsensor = config.windowsensor === undefined ? true : config.windowsensor;
   this.myAccessories = [];
   this.updateRate = 10000;
+  if(!this.config || !this.config.ip || !this.config.port){
+    this.log("Warning: MaxCube Plugin not configured!");
+    return;
+  }
   this.cube = new MaxCube(this.config.ip, this.config.port);
   this.setupCube();
   this.maxSwitch = null;
-  if(api){
-    this.api = api;
-    this.api.on('didFinishLaunching', function () {
-      if(!self.maxSwitch){
-        self.maxSwitch = new MaxCubeLinkSwitchAccessory(self);
-      }
-      self.cube.getConnection();
-    });
-  }
+  this.api.on('didFinishLaunching', function () {
+    if(!self.maxSwitch){
+      self.maxSwitch = new MaxCubeLinkSwitchAccessory(self);
+    }
+    self.cube.getConnection();
+  });
 }
 MaxCubePlatform.prototype = {
-  setupCube: function(callback) {
+  setupCube: function() {
     let that = this;
     this.cube.on('error', function (error) {
       that.log("Max! Cube connection error!");
@@ -71,6 +73,7 @@ MaxCubePlatform.prototype = {
     });
   },
   configureAccessory: function(accessory) {
+    let that = this;
     if (!this.config) { // happens if plugin is disabled and still active accessories
       return;
     }
@@ -86,8 +89,10 @@ MaxCubePlatform.prototype = {
       this.maxSwitch = new MaxCubeLinkSwitchAccessory(this, accessory);
     } else{
       // don't know this, delete it from HomeKit
-      this.log('Removing unknown Accessory ' + accessory.displayName + ' from HomeKit');
-      this.api.unregisterPlatformAccessories('homebridge-platform-maxcube', 'MaxCubePlatform', [accessory.accessory]);
+      this.api.on('didFinishLaunching', function () {
+        that.log('Removing unknown Accessory ' + accessory.displayName + ' from HomeKit');
+        that.api.unregisterPlatformAccessories('homebridge-platform-maxcube', 'MaxCubePlatform', [accessory]);
+      });
     }
   },
   updateThermostatData: function(){
