@@ -61,11 +61,12 @@ MaxCubePlatform.prototype = {
           }
           deviceList.push(device);
         });
-        that.myAccessories.forEach(function (accessory){
+        that.myAccessories.forEach(function (accessory, idx, obj){
           if(deviceList.find(device=>device.rf_address === accessory.device.rf_address) === undefined) {
             // remove from homekit
             that.log('Removing ' + accessory.displayName + ' from HomeKit');
             that.api.unregisterPlatformAccessories('homebridge-platform-maxcube', 'MaxCubePlatform', [accessory.accessory]);
+            obj.splice(idx,1);
           }
         });
         that.updateThermostatData();
