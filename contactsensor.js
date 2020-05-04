@@ -15,7 +15,7 @@ function ContactSensor(homebridge, platform, device, accessory = null){
   this.open = this.device.open;
 
   if(accessory){
-    this.name = accessory.context.deviceName;
+    this.name = accessory.context.name;
     this.accessory = accessory;
     this.informationService = accessory.getService(Service.AccessoryInformation);
     this.contactService = accessory.getService(Service.ContactSensor);
