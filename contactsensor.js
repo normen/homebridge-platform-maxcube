@@ -10,7 +10,7 @@ function ContactSensor(homebridge, platform, device, accessory = null){
   Accessory = homebridge.platformAccessory;
   this.log = platform.log;
   this.config = platform.config;
-  this.cube = platform.cube;
+  if(platform.cube) this.setCube(platform.cube);
   this.device = device;
   this.open = this.device.open;
 
@@ -48,11 +48,14 @@ function ContactSensor(homebridge, platform, device, accessory = null){
   this.contactService
     .getCharacteristic(Characteristic.StatusLowBattery)
     .on('get', this.getLowBatteryStatus.bind(this));
-
-  this.cube.on('device_list', this.refreshDevice.bind(this));
 };
 
 ContactSensor.prototype = {
+  setCube: function(cube){
+    if(this.cube) return;
+    this.cube = cube;
+    this.cube.on('device_list', this.refreshDevice.bind(this));
+  },
   refreshDevice: function(devices){
     let that = this;
     let device = devices.filter(function(item) { return item.rf_address === that.device.rf_address; })[0];
