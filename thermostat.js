@@ -10,7 +10,6 @@ function Thermostat(homebridge, platform, device, accessory = null){
   UUIDGen = homebridge.hap.uuid;
   this.log = platform.log;
   this.config = platform.config;
-  this.cube = platform.cube;
   this.device = device;
   this.lastNonZeroTemp = this.device.temp;
   this.temperatureDisplayUnits = Characteristic.TemperatureDisplayUnits.CELSIUS;
@@ -18,6 +17,7 @@ function Thermostat(homebridge, platform, device, accessory = null){
   this.sendFault = false;
   this.lastManualChange = new Date(0);
 
+  if(platform.cube) this.setCube(platform.cube);
   this.checkHeatingCoolingState();
 
   if(accessory){
@@ -98,11 +98,14 @@ function Thermostat(homebridge, platform, device, accessory = null){
   this.thermostatService
     .getCharacteristic(Characteristic.StatusFault)
     .on('get', this.getErrorStatus.bind(this));
-
-  this.cube.on('device_list', this.refreshDevice.bind(this));
 };
 
 Thermostat.prototype = {
+  setCube: function(cube){
+    if(this.cube) return;
+    this.cube = cube;
+    this.cube.on('device_list', this.refreshDevice.bind(this));
+  },
   refreshDevice: function(devices){
     let that = this;
     let device = devices.filter(function(item) { return item.rf_address === that.device.rf_address; })[0];

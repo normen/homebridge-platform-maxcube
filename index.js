@@ -17,10 +17,10 @@ function MaxCubePlatform(log, config, api){
     this.log("Warning: MaxCube Plugin not configured!");
     return;
   }
-  this.cube = new MaxCube(this.config.ip, this.config.port);
-  this.setupCube();
   this.maxSwitch = null;
   this.api.on('didFinishLaunching', function () {
+    self.cube = new MaxCube(self.config.ip, self.config.port);
+    self.setupCube();
     if(!self.maxSwitch){
       self.maxSwitch = new MaxCubeLinkSwitchAccessory(self);
     }
@@ -67,6 +67,9 @@ MaxCubePlatform.prototype = {
             that.log('Removing ' + accessory.displayName + ' from HomeKit');
             that.api.unregisterPlatformAccessories('homebridge-platform-maxcube', 'MaxCubePlatform', [accessory.accessory]);
             obj.splice(idx,1);
+          } else {
+            // apply cube for restored devices
+            accessory.setCube(that.cube);
           }
         });
         that.updateThermostatData();
