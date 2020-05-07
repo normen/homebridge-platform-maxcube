@@ -1,4 +1,4 @@
-# homebridge-platform-maxcube [![NPM Version](https://img.shields.io/npm/v/homebridge-platform-maxcube.svg)](https://www.npmjs.com/package/homebridge-platform-maxcube) [![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
+# homebridge-platform-maxcube [![NPM Version](https://img.shields.io/npm/v/homebridge-platform-maxcube.svg)](https://www.npmjs.com/package/homebridge-platform-maxcube)
 Homebridge plugin to bring the eq-3 Max! Cube to Apples HomeKit. Automatically registers all configured devices so that you should instantly be able to control your home heating through Siri & HomeKit.
 
 ### Status of this package:
