@@ -101,7 +101,8 @@ MaxCubePlatform.prototype = {
   },
   updateThermostatData: function(){
     // called periodically to trigger maxcube data update
-    setTimeout(this.updateThermostatData.bind(this),this.updateRate);
+    if(this.updateTimeout) clearTimeout(this.updateTimeout);
+    this.updateTimeout = setTimeout(this.updateThermostatData.bind(this),this.updateRate);
     let that = this;
     if(!this.paused) this.cube.getConnection().then(function () {
       that.cube.updateDeviceStatus();
