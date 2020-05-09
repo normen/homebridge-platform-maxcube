@@ -133,7 +133,11 @@ function MaxCubeLinkSwitchAccessory(cubePlatform, accessory = null){
     this.accessory = accessory;
     this.service = accessory.getService(Service.Switch);
   } else {
-    this.accessory = new Accessory(this.name, UUIDGen.generate(this.name + " Switch"));
+    var uuidBase = this.name;
+    if(cubePlatform.config.name){
+      uuidBase = uuidBase + cubePlatform.config.name;
+    }
+    this.accessory = new Accessory(this.name, UUIDGen.generate(uuidBase));
     this.accessory.context.isMaxSwitch = true;
     this.service = new Service.Switch("Max! Link");
     this.accessory.addService(this.service);
