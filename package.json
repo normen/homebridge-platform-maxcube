@@ -12,7 +12,9 @@
     "type": "git",
     "url": "https://github.com/normen/homebridge-platform-maxcube.git"
   },
-  "scripts": {},
+  "scripts": {
+    "test": "./node_modules/homebridge/bin/homebridge -I -U ./.homebridge"
+  },
   "bugs": {
     "url": "https://github.com/normen/homebridge-platform-maxcube/issues"
   },
@@ -34,6 +36,9 @@
   },
   "dependencies": {
     "maxcube2": "^2.1.2"
+  },
+  "devDependencies": {
+    "homebridge": "^1.0.0"
   },
   "homepage": "https://github.com/normen/homebridge-platform-maxcube#readme",
   "main": "index.js"
