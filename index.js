@@ -13,6 +13,7 @@ function MaxCubePlatform(log, config, api){
   this.windowsensor = config.windowsensor === undefined ? true : config.windowsensor;
   this.myAccessories = [];
   this.updateRate = 10000;
+  this.connected = false;
   if(!this.config || !this.config.ip || !this.config.port){
     this.log("Warning: MaxCube Plugin not configured!");
     return;
@@ -31,16 +32,19 @@ MaxCubePlatform.prototype = {
   setupCube: function() {
     let that = this;
     this.cube.on('error', function (error) {
+      that.connected = false;
       that.log("Max! Cube connection error!");
       that.log(error);
       if(that.maxSwitch) that.maxSwitch.sendStatus();
     });
     this.cube.on('closed', function () {
+      that.connected = false;
       that.paused = true;
       that.log("Max! Cube connection closed.");
       if(that.maxSwitch) that.maxSwitch.sendStatus();
     });
     this.cube.on('connected', function () {
+      that.connected = true;
       that.paused = false;
       that.log("Connected to Max! Cube.");
       if(that.maxSwitch) that.maxSwitch.sendStatus();
@@ -112,10 +116,12 @@ MaxCubePlatform.prototype = {
     return (this.myAccessories.find(accessory => accessory.device.rf_address === device.rf_address) !== undefined); 
   },
   startCube: function(){
+    if(!this.cube) return;
     this.log("Try connecting to Max! Cube..");
     this.cube.getConnection();
   },
   stopCube: function(){
+    if(!this.cube) return;
     let that = this;
     this.log("Closing connection to Max! Cube..");
     if(this.cube){
@@ -170,10 +176,10 @@ MaxCubeLinkSwitchAccessory.prototype = {
     callback(null, state);
   },
   getConnectionState: function(callback){
-    callback(null, this.cubePlatform.cube.initialised);
+    callback(null, this.cubePlatform.connected);
   },
   sendStatus: function(){
-    this.service.getCharacteristic(Characteristic.On).updateValue(this.cubePlatform.cube.initialised);
+    this.service.getCharacteristic(Characteristic.On).updateValue(this.cubePlatform.connected);
   }
 }
 
