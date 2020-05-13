@@ -1,5 +1,10 @@
 # Changelog for homebridge-platform-maxcube
-For documentation please see https://github.com/normen/homebridge-platform-maxcube
+This is the change log for the plugin, all relevant changes will be listed here.
+
+For documentation please see the [README](https://github.com/normen/homebridge-platform-maxcube/blob/master/README.md)
+
+## 2.0.9
+- add changelog
 
 ## 2.0.8
 - harden against nonstandard initialization
