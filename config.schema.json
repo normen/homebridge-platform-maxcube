@@ -1,7 +1,7 @@
 {
   "pluginAlias": "MaxCubePlatform",
   "pluginType": "platform",
-  "footerDisplay": "For documentation please see the https://github.com/normen/homebridge-platform-maxcube",
+  "footerDisplay": "For documentation please see https://github.com/normen/homebridge-platform-maxcube",
   "schema": {
     "name": {
       "title": "Name",
