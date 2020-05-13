@@ -1,4 +1,5 @@
-# Changelog
+# Changelog for homebridge-platform-maxcube
+For documentation please see https://github.com/normen/homebridge-platform-maxcube
 
 ## 2.0.8
 - harden against nonstandard initialization

@@ -138,28 +138,4 @@ If you want new features or improve the plugin, you're very welcome to do so. Th
 - run `npm run test` to start the homebridge instance for testing
 
 ### Version History
-
-#### v2.0.0
-- Uses homebridges "dynamic accessory model"
-- Cube only needs to be connected on the first initialization, doesn't block homebridge boot when cube is not found
-- Changes in Max! are fetched on each connect, no HomeBridge reboot
-
-#### v1.1.2
-- Reset max cube errors so that thermostat devices react again after max cube rf errors
-
-#### v1.1.0
-- Reads default values (off/eco/comfort) from Max! settings
-- Allow toggling off/eco/manual/auto via HomeKit mode
-- Allows changing temperature in 0.5deg steps
-- Auto-connects when changing values with Max! Link off
-- Fix values "flipping back" while changing them
-- Cleanup handling of cube connection with new maxcube2 library
-- General code cleanups & README updates
-
-#### v1.0.0
-- First full-feature release
-- Thermostat support
-- Window contact support
-- Wall thermostat support
-- Stable connection using maxcube2 library
-- Robust against network connection losses
+see the [Changelog](CHANGELOG.md)
