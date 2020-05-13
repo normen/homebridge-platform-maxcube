@@ -5,6 +5,7 @@ For documentation please see the [README](https://github.com/normen/homebridge-p
 
 ## 2.0.9
 - add changelog
+- cleanups
 
 ## 2.0.8
 - harden against nonstandard initialization
