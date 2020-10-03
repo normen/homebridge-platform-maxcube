@@ -1,36 +1,61 @@
 var Service;
 var Characteristic;
+var UUIDGen;
+var Accessory;
 
-function ContactSensor(homebridge, platform, device){
+function ContactSensor(homebridge, platform, device, accessory = null){
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
+  UUIDGen = homebridge.hap.uuid;
+  Accessory = homebridge.platformAccessory;
   this.log = platform.log;
   this.config = platform.config;
-  this.cube = platform.cube;
+  if(platform.cube) this.setCube(platform.cube);
   this.device = device;
-  this.deviceInfo = this.cube.getDeviceInfo(device.rf_address);
   this.open = this.device.open;
-  this.name = this.deviceInfo.device_name + ' (' + this.deviceInfo.room_name + ')';
 
-  this.informationService = new Service.AccessoryInformation();
-  this.informationService
-    .setCharacteristic(Characteristic.Manufacturer, 'EQ-3')
-    .setCharacteristic(Characteristic.Model, 'EQ3 - '+ this.device.rf_address)
-    .setCharacteristic(Characteristic.SerialNumber, this.device.rf_address)
+  if(accessory){
+    this.name = accessory.context.name;
+    this.accessory = accessory;
+    this.informationService = accessory.getService(Service.AccessoryInformation);
+    this.contactService = accessory.getService(Service.ContactSensor);
+  } else {
+    this.deviceInfo = this.cube.getDeviceInfo(device.rf_address);
+    this.name = this.deviceInfo.device_name + ' (' + this.deviceInfo.room_name + ')';
 
-  this.contactService = new Service.ContactSensor(this.device.address);
+    var uuid = UUIDGen.generate(this.device.rf_address + this.name);
+    this.log('Creating new accessory for ' + this.name);
+    this.accessory = new Accessory(this.name, uuid);
+    this.informationService = this.accessory.getService(Service.AccessoryInformation);
+    this.informationService
+     .setCharacteristic(Characteristic.Manufacturer, 'EQ-3')
+     .setCharacteristic(Characteristic.Model, 'EQ3 - '+ this.device.rf_address)
+     .setCharacteristic(Characteristic.SerialNumber, this.device.rf_address)
+
+    this.contactService = new Service.ContactSensor();
+    this.accessory.addService(this.contactService);
+    this.accessory.context.device = this.device;
+    this.accessory.context.name = this.name;
+    this.accessory.context.deviceType = 1;
+    this.contactService
+      .addCharacteristic(new Characteristic.StatusLowBattery())
+    platform.api.registerPlatformAccessories('homebridge-platform-maxcube', 'MaxCubePlatform', [this.accessory] );
+  }
   this.contactService
     .getCharacteristic(Characteristic.ContactSensorState)
     .on('get', this.getContactSensorState.bind(this));
 
   this.contactService
-    .addCharacteristic(new Characteristic.StatusLowBattery())
+    .getCharacteristic(Characteristic.StatusLowBattery)
     .on('get', this.getLowBatteryStatus.bind(this));
-
-  this.cube.on('device_list', this.refreshDevice.bind(this));
 };
 
 ContactSensor.prototype = {
+  setCube: function(cube){
+    if(this.cube) return;
+    this.cube = cube;
+    this.cube.on('device_list', this.refreshDevice.bind(this));
+  },
   refreshDevice: function(devices){
     let that = this;
     let device = devices.filter(function(item) { return item.rf_address === that.device.rf_address; })[0];

@@ -1,35 +1,69 @@
 var Service;
 var Characteristic;
+var Accessory;
+var UUIDGen;
 
-function Thermostat(homebridge, platform, device){
+function Thermostat(homebridge, platform, device, accessory = null){
   Service = homebridge.hap.Service;
   Characteristic = homebridge.hap.Characteristic;
+  Accessory = homebridge.platformAccessory;
+  UUIDGen = homebridge.hap.uuid;
   this.log = platform.log;
   this.config = platform.config;
-  this.cube = platform.cube;
   this.device = device;
-  this.deviceInfo = this.cube.getDeviceInfo(device.rf_address);
-  this.deviceConfig = this.cube.getDeviceConfiguration(device.rf_address);
   this.lastNonZeroTemp = this.device.temp;
-  this.name = this.deviceInfo.device_name + ' (' + this.deviceInfo.room_name + ')';
   this.temperatureDisplayUnits = Characteristic.TemperatureDisplayUnits.CELSIUS;
-  this.comfortTemp = this.deviceConfig.comfort_temp || 20;
-  this.ecoTemp = this.deviceConfig.eco_temp || 17;
-  this.offTemp = this.deviceConfig.min_setpoint_temp || 5;
-  this.maxTemp = this.deviceConfig.max_setpoint_temp || 30;
   this.inputOutputTimeout = 10000;
   this.sendFault = false;
   this.lastManualChange = new Date(0);
 
+  if(platform.cube) this.setCube(platform.cube);
   this.checkHeatingCoolingState();
 
-  this.informationService = new Service.AccessoryInformation();
-  this.informationService
-    .setCharacteristic(Characteristic.Manufacturer, 'EQ-3')
-    .setCharacteristic(Characteristic.Model, 'EQ3 - '+ this.device.rf_address)
-    .setCharacteristic(Characteristic.SerialNumber, this.device.rf_address)
+  if(accessory){
+    this.name = accessory.context.name;
+    this.comfortTemp = accessory.context.comfortTemp;
+    this.ecoTemp = accessory.context.ecoTemp;
+    this.offTemp = accessory.context.offTemp;
+    this.maxTemp = accessory.context.maxTemp;
 
-  this.thermostatService = new Service.Thermostat(this.device.address);
+    this.accessory = accessory;
+    this.informationService = accessory.getService(Service.AccessoryInformation);
+    this.thermostatService = accessory.getService(Service.Thermostat);
+  } else {
+    this.deviceInfo = this.cube.getDeviceInfo(device.rf_address);
+    this.name = this.deviceInfo.device_name + ' (' + this.deviceInfo.room_name + ')';
+
+    this.deviceConfig = this.cube.getDeviceConfiguration(device.rf_address);
+    this.comfortTemp = this.deviceConfig.comfort_temp || 20;
+    this.ecoTemp = this.deviceConfig.eco_temp || 17;
+    this.offTemp = this.deviceConfig.min_setpoint_temp || 5;
+    this.maxTemp = this.deviceConfig.max_setpoint_temp || 30;
+
+    var uuid = UUIDGen.generate(this.device.rf_address + this.name);
+    this.log('Creating new accessory for ' + this.name);
+    this.accessory = new Accessory(this.name, uuid);
+    this.accessory.context.device = this.device;
+    this.accessory.context.name = this.name;
+    this.accessory.context.comfortTemp = this.comfortTemp;
+    this.accessory.context.ecoTemp = this.ecoTemp;
+    this.accessory.context.offTemp = this.offTemp;
+    this.accessory.context.maxTemp = this.maxTemp;
+    this.accessory.context.deviceType = 0;
+    this.thermostatService = new Service.Thermostat();
+    this.accessory.addService(this.thermostatService);
+    this.informationService = this.accessory.getService(Service.AccessoryInformation);
+    this.informationService
+     .setCharacteristic(Characteristic.Manufacturer, 'EQ-3')
+     .setCharacteristic(Characteristic.Model, 'EQ3 - '+ this.device.rf_address)
+     .setCharacteristic(Characteristic.SerialNumber, this.device.rf_address)
+    this.thermostatService
+     .addCharacteristic(new Characteristic.StatusFault());
+    this.thermostatService
+     .addCharacteristic(new Characteristic.StatusLowBattery());
+    platform.api.registerPlatformAccessories('homebridge-platform-maxcube', 'MaxCubePlatform', [this.accessory] );
+  }
+
   this.thermostatService
     .getCharacteristic(Characteristic.CurrentHeatingCoolingState)
     .on('get', this.getCurrentHeatingCoolingState.bind(this));
@@ -58,17 +92,20 @@ function Thermostat(homebridge, platform, device){
     .on('get', this.getTemperatureDisplayUnits.bind(this));
 
   this.thermostatService
-    .addCharacteristic(new Characteristic.StatusLowBattery())
+    .getCharacteristic(Characteristic.StatusLowBattery)
     .on('get', this.getLowBatteryStatus.bind(this));
 
   this.thermostatService
-    .addCharacteristic(new Characteristic.StatusFault())
+    .getCharacteristic(Characteristic.StatusFault)
     .on('get', this.getErrorStatus.bind(this));
-
-  this.cube.on('device_list', this.refreshDevice.bind(this));
 };
 
 Thermostat.prototype = {
+  setCube: function(cube){
+    if(this.cube) return;
+    this.cube = cube;
+    this.cube.on('device_list', this.refreshDevice.bind(this));
+  },
   refreshDevice: function(devices){
     let that = this;
     let device = devices.filter(function(item) { return item.rf_address === that.device.rf_address; })[0];

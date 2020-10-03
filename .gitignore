@@ -1,0 +1,4 @@
+node_modules/
+.homebridge/
+package-lock.json
+tags
