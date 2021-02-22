@@ -3,6 +3,10 @@ This is the change log for the plugin, all relevant changes will be listed here.
 
 For documentation please see the [README](https://github.com/normen/homebridge-platform-maxcube/blob/master/README.md)
 
+## 2.0.10
+- fix BatteryStatus return type
+- update dependencies
+
 ## 2.0.9
 - add changelog
 - cleanups
