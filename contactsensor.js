@@ -85,7 +85,7 @@ ContactSensor.prototype = {
     callback(null, this.device.open);
   },
   getLowBatteryStatus: function(callback) {
-    callback(null, this.device.battery_low);
+    callback(null, this.device.battery_low?1:0);
   },
   getErrorStatus: function(callback) {
     callback(null, this.errorStatus());
