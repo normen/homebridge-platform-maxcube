@@ -210,7 +210,7 @@ Thermostat.prototype = {
       that.cube.setTemperature(that.device.rf_address, targetTemp, targetMode);
       that.sendFault = false;
     }, function(){that.sendFault = true});
-    callback(null, this.targetHeatingCoolingState);
+    callback(null);
   },
   getCurrentTemperature: function(callback) {
     callback(null, this.lastNonZeroTemp);
@@ -232,7 +232,7 @@ Thermostat.prototype = {
       that.cube.setTemperature(that.device.rf_address, value, that.device.mode);
       that.sendFault = false;
     }, function(){that.sendFault = true});
-    callback(null, value);
+    callback(null);
   },
   getTemperatureDisplayUnits: function(callback) {
     callback(null, this.temperatureDisplayUnits);
