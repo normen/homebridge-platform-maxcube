@@ -201,7 +201,7 @@ Thermostat.prototype = {
     this.device.setpoint = targetTemp;
     this.checkHeatingCoolingState();
     let errorStatus = that.errorStatus();
-    this.cube.getConnection().then(function () {
+    if(this.cube) this.cube.getConnection().then(function () {
       if(errorStatus != 0){
         that.log(that.name+' has error state '+ errorStatus + ' - sending error reset to cube');
         that.cube.resetError(that.device.rf_address);
