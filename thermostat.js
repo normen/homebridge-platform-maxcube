@@ -122,11 +122,11 @@ Thermostat.prototype = {
     }
     // publish changes in data so events can be triggered by data changes
     if(oldDevice.battery_low != this.device.battery_low){
-      this.thermostatService.getCharacteristic(Characteristic.StatusLowBattery).updateValue(this.device.battery_low);
+      this.thermostatService.getCharacteristic(Characteristic.StatusLowBattery).updateValue(this.device.battery_low?1:0);
       this.log(this.name+' - received new low battery state '+this.device.battery_low);
     }
     if(oldDevice.setpoint != this.device.setpoint){
-      this.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(this.device.setpoint);
+      if(this.device.setpoint>=this.offTemp) this.thermostatService.getCharacteristic(Characteristic.TargetTemperature).updateValue(this.device.setpoint);
       this.log(this.name+' - received new target temperature '+this.device.setpoint);
     }
     if(oldDevice.temp != this.device.temp){
@@ -216,7 +216,11 @@ Thermostat.prototype = {
     callback(null, this.lastNonZeroTemp);
   },
   getTargetTemperature: function(callback) {
-    callback(null, this.device.setpoint);
+    if(this.device.setpoint>this.offTemp){
+      callback(null, this.device.setpoint);
+    } else{
+      callback(null, this.offTemp);
+    }
   },
   setTargetTemperature: function(value, callback) {
     this.lastManualChange = new Date();
@@ -244,17 +248,10 @@ Thermostat.prototype = {
     callback(null, this.errorStatus());
   },
   errorStatus: function(){
-    var status = 0;
-    if(this.device.error){
-      status|=1;
+    if(this.device.error||this.device.link_error||this.sendFault){
+      return 1;
     }
-    if(this.device.link_error){
-      status|=2;
-    }
-    if(this.sendFault){
-      status|=4;
-    }
-    return status;
+    return 0;
   },
   getServices: function(){
     return [this.informationService,this.thermostatService];
