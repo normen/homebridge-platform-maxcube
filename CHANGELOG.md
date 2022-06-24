@@ -3,6 +3,9 @@ This is the change log for the plugin, all relevant changes will be listed here.
 
 For documentation please see the [README](https://github.com/normen/homebridge-platform-maxcube/blob/master/README.md)
 
+## 2.0.15
+- small fix in error logging on disconnect
+
 ## 2.0.14
 - reconnect more aggressively on errors
 

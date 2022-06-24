@@ -123,6 +123,7 @@ MaxCubePlatform.prototype = {
     if(!this.cube) return;
     this.log("Closing connection to Max! Cube..");
     this.paused = true;
+    let that = this;
     try{this.cube.close()}catch(error){that.error(error)}
   }
 };
