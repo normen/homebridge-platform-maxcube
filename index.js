@@ -39,13 +39,11 @@ MaxCubePlatform.prototype = {
     });
     this.cube.on('closed', function () {
       that.connected = false;
-      that.paused = true;
       that.log("Max! Cube connection closed.");
       if(that.maxSwitch) that.maxSwitch.sendStatus();
     });
     this.cube.on('connected', function () {
       that.connected = true;
-      that.paused = false;
       that.log("Connected to Max! Cube.");
       if(that.maxSwitch) that.maxSwitch.sendStatus();
       that.cube.getDeviceStatus().then(function (devices) {
@@ -118,15 +116,14 @@ MaxCubePlatform.prototype = {
   startCube: function(){
     if(!this.cube) return;
     this.log("Try connecting to Max! Cube..");
+    this.paused = false;
     this.cube.getConnection();
   },
   stopCube: function(){
     if(!this.cube) return;
-    let that = this;
     this.log("Closing connection to Max! Cube..");
-    if(this.cube){
-      try{this.cube.close()}catch(error){that.error(error)}
-    }
+    this.paused = true;
+    try{this.cube.close()}catch(error){that.error(error)}
   }
 };
 
