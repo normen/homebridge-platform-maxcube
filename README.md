@@ -11,7 +11,7 @@ The good news is that if you want to move your existing setup to FHEM as well yo
 - Install [fhem plugin](https://github.com/justme-1968/homebridge-fhem) in homebridge
 - Define Siri in fhem
 - Define Max in fhem according to [this guide](https://wiki.fhem.de/wiki/MAX)
-- Define SIGNALduino in fhem
+- Define SIGNALduino in fhem according to [this guide](https://wiki.fhem.de/wiki/SIGNALduino)
 - Apply `attrTemplate` (see template below) for discovered devices
 - Set `siriName` for discovered devices so they appear in homekit
 - Profit
