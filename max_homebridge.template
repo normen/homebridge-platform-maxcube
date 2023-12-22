@@ -1,0 +1,104 @@
+######################################################################
+# $Id: max_homebridge.template 22075 2023-04-01 16:42:23Z Wzut, normen $
+#
+# Comments start with #. Empty lines are ignored.
+# Syntax of one entry:
+#   name: line,
+#   one optional filter: line
+#   zero or more par: lines
+#   FHEM-Commands
+# filter:INTERNAL=VALUE (optional)
+# par: name of the parameter; comment; perl_code (optional)
+# perl_code returns a value for the parameter, or undef.
+# If undef, the user has to specify them (the comment is shown to the user)
+######################################################################
+
+######################################################################
+name:MAX_HeatingThermostat_homekit
+filter:TYPE=MAX:FILTER=devtype=(1|2)
+desc:To configure a HeatingThermostat
+order:N1
+par:ICON;ICON as set, defaults to MAX;{ AttrVal("DEVICE","icon","max_heizungsthermostat") }
+par:COMMENT;COMMENT as set, defaults to MAX;{ AttrVal("DEVICE","comment","Configured using template MAX_HeatingThermostat_dark") }
+par:DEBUG;DEBUG as set, defaults to MAX;{ AttrVal("DEVICE","debug","1") }
+par:ACT;ACT as set, defaults to MAX;{ AttrVal("DEVICE","actCycle","1:0") }
+par:CONFIG;CONFIG as set, defaults to MAX;{ AttrVal("DEVICE","autosaveConfig","1") }
+par:EOCR;EOCR as set, defaults to MAX;{ AttrVal("DEVICE","event-on-change-reading",".*") }
+attr DEVICE icon ICON
+attr DEVICE comment COMMENT
+attr DEVICE devStateIcon auto:sani_heating_automatic@lightgray manual:sani_heating_manual@yellow boost:sani_heating_boost@yellow temporary:sani_heating_timer@red ok:measure_battery_100@green low:measure_battery_0@red (0|alive):10px-kreis-gruen (1|dead):10px-kreis-rot timeout:10px-kreis-gelb
+attr DEVICE stateFormat mode\
+battery\
+rferror\
+Activity
+attr DEVICE webCmd temperature:desiredTemperature:valveposition
+attr DEVICE webCmdLabel LABEL
+attr DEVICE widgetOverride valveposition:slider,0,1,100 temperature:selectnumbers,15,0.1,29,1,lin
+attr DEVICE debug DEBUG
+attr DEVICE keepAuto 1
+attr DEVICE actCycle ACT
+attr DEVICE autosaveConfig CONFIG
+attr DEVICE event-on-change-reading EOCR
+attr DEVICE homebridgeMapping TargetHeatingCoolingState=heatingState,values=OFF:0;;;;HEAT:1;;;;COOL:2;;;;AUTO:3,cmds=OFF:desiredTemperature+off;;;;HEAT:mode+manual;;;;AUTO:desiredTemperature+auto;;;;COOL:desiredTemperature+eco\
+CurrentHeatingCoolingState=heatingState,values=OFF:0;;;;HEAT:1;;;;COOL:2;;;;AUTO:0\
+StatusLowBattery=battery,values=ok:BATTERY_LEVEL_NORMAL;;;;;;;;/^.*/:BATTERY_LEVEL_LOW\
+history:size=1024
+attr DEVICE userReadings heatingState {(ReadingsVal($NAME,"valveposition",0) > 0 || ReadingsVal($NAME,"desiredTemperature","-") eq "on") ? "HEAT" : ReadingsVal($NAME,"desiredTemperature","-") eq "off" ? "OFF" : ReadingsVal($NAME,"mode","auto") eq "auto" ? "AUTO" : (ReadingsVal($NAME,"temperature",20) > ReadingsVal($NAME,"desiredTemperature",20)) ? "COOL" : "AUTO"}
+set DEVICE attrTemplate speechcontrol_type_thermostat
+attr DEVICE room MAX_HT
+######################################################################
+
+######################################################################
+name:MAX_WallMountedThermostat_homekit
+filter:TYPE=MAX:FILTER=devtype=(3|7)
+desc:To configure a WallMountedThermostat
+order:N2
+par:ICON;ICON as set, defaults to MAX;{ AttrVal("DEVICE","icon","max_wandthermostat") }
+par:COMMENT;COMMENT as set, defaults to MAX;{ AttrVal("DEVICE","comment","Configured using template MAX_WallMountedThermostat_dark") }
+par:DEBUG;DEBUG as set, defaults to MAX;{ AttrVal("DEVICE","debug","1") }
+par:ACT;ACT as set, defaults to MAX;{ AttrVal("DEVICE","actCycle","0:15") }
+par:CONFIG;CONFIG as set, defaults to MAX;{ AttrVal("DEVICE","autosaveConfig","1") }
+par:EOCR;EOCR as set, defaults to MAX;{ AttrVal("DEVICE","event-on-change-reading",".*") }
+par:LABEL;;{ (AttrVal('global','language','DE') eq 'DE') ? return 'Ist<br>:Soll<br>:Ventil<br>' : return 'Actual<br>Desired<br>:Valveposition<br>' }
+attr DEVICE icon ICON
+attr DEVICE comment COMMENT
+attr DEVICE debug DEBUG
+attr DEVICE keepAuto 1
+attr DEVICE actCycle ACT
+attr DEVICE devStateIcon auto:sani_heating_automatic@lightgray manual:sani_heating_manual@yellow boost:sani_heating_boost@yellow temporary:sani_heating_timer@red ok:measure_battery_100@green low:measure_battery_0@red (0|alive):10px-kreis-gruen (1|dead):10px-kreis-rot timeout:10px-kreis-gelb
+attr DEVICE stateFormat mode\
+battery\
+rferror\
+Activity
+attr DEVICE webCmd temperature:desiredTemperature
+attr DEVICE webCmdLabel LABEL
+attr DEVICE widgetOverride temperature:selectnumbers,15,0.1,29,1,lin
+attr DEVICE autosaveConfig CONFIG
+attr DEVICE event-on-change-reading EOCR
+attr DEVICE homebridgeMapping TargetHeatingCoolingState=heatingState,values=OFF:0;;;;HEAT:1;;;;COOL:2;;;;AUTO:3,cmds=OFF:desiredTemperature+off;;;;HEAT:mode+manual;;;;AUTO:desiredTemperature+auto;;;;COOL:desiredTemperature+eco\
+CurrentHeatingCoolingState=heatingState,values=OFF:0;;;;HEAT:1;;;;COOL:2;;;;AUTO:0\
+StatusLowBattery=battery,values=ok:BATTERY_LEVEL_NORMAL;;;;;;;;/^.*/:BATTERY_LEVEL_LOW\
+history:size=1024
+attr DEVICE userReadings heatingState {(ReadingsVal($NAME,"valveposition",0) > 0 || ReadingsVal($NAME,"desiredTemperature","-") eq "on") ? "HEAT" : ReadingsVal($NAME,"desiredTemperature","-") eq "off" ? "OFF" : ReadingsVal($NAME,"mode","auto") eq "auto" ? "AUTO" : (ReadingsVal($NAME,"temperature",20) > ReadingsVal($NAME,"desiredTemperature",20)) ? "COOL" : "AUTO"}
+set DEVICE attrTemplate speechcontrol_type_thermostat
+attr DEVICE room MAX_WT
+######################################################################
+
+######################################################################
+name:MAX_ShutterContact_homekit
+filter:TYPE=MAX:FILTER=devtype=(4|6)
+desc:To configure a ShutterContact
+order:N3
+par:ICON;ICON as set, defaults to MAX;{ AttrVal("DEVICE","icon","hm-sec-win") }
+par:DEBUG;DEBUG as set, defaults to MAX;{ AttrVal("DEVICE","debug","1") }
+par:COMMENT;COMMENT as set, defaults to MAX;{ AttrVal("DEVICE","comment","Configured using template MAX_ShutterContact_dark") }
+par:EOCR;EOCR as set, defaults to MAX;{ AttrVal("DEVICE","event-on-change-reading",".*") }
+attr DEVICE icon ICON
+attr DEVICE comment COMMENT
+attr DEVICE debug DEBUG
+attr DEVICE event-on-change-reading EOCR
+attr DEVICE devStateIcon closed:fts_window_1w opened:fts_window_1w_open
+attr DEVICE homebridgeMapping StatusLowBattery=state,values=/(opened|closed)$/:BATTERY_LEVEL_NORMAL;;;;;;;;/^.*/:BATTERY_LEVEL_LOW\
+ContactSensorState=state,values=/opened/:1;;/closed/:0
+attr DEVICE room MAX_SC
+######################################################################

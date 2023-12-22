@@ -9,21 +9,14 @@ The good news is that if you want to move your existing setup to FHEM as well yo
 - Use max cube or build/buy a CUL 868MHz stick
 - Install [FHEM](https://fhem.de) on raspi
 - Install [fhem plugin](https://github.com/justme-1968/homebridge-fhem) in homebridge
-- Define siri in fhem
-- Define max in fhem
-- Set sync mode
+- Define Siri in fhem
+- Define Max in fhem
 - Define SIGNALduino in fhem
-- Set siriName for discovered devices
+- Apply `attrTemplate` (see template below) for discovered devices
+- Set `siriName` for discovered devices so they appear in homekit
 - Profit
 
-- `homebridgeMapping`
-```
-attr Schlafzimmer.Thermostat homebridgeMapping TargetHeatingCoolingState=heatingState,values=OFF:0;;;;HEAT:1;;;;COOL:2;;;;AUTO:3,cmds=OFF:desiredTemperature+off;;;;HEAT:mode+manual;;;;AUTO:desiredTemperature+auto;;;;COOL:desiredTemperature+eco CurrentHeatingCoolingState=heatingState,values=OFF:0;;;;HEAT:1;;;;COOL:2;;;;AUTO:0\
-  StatusLowBattery=battery,values=ok:BATTERY_LEVEL_NORMAL;;;;;;;;/^.*/:BATTERY_LEVEL_LOW
-attr Schlafzimmer.Thermostat model HeatingThermostat
-attr Schlafzimmer.Thermostat userReadings heatingState {(ReadingsVal($NAME,"valveposition",0) > 0 || ReadingsVal($NAME,"desiredTemperature","-") eq "on") ? "HEAT" : ReadingsVal($NAME,"desiredTemperature","-") eq "off" ? "OFF" : ReadingsVal($NAME,"mode","auto") eq "auto" ? "AUTO" : (ReadingsVal($NAME,"temperature",20) > ReadingsVal($NAME,"desiredTemperature",20)) ? "COOL" : "AUTO"}
-attr Schlafzimmer.Thermostat siriName Schlafzimmer Thermostat
-```
+Put [this file](max_homebridge.template) in your `/opt/fhem/FHEM/lib/AttrTemplate` folder, then apply the templates through the FHEMWEB UI `set` command or otherwise.
 
 # homebridge-platform-maxcube [![NPM Version](https://img.shields.io/npm/v/homebridge-platform-maxcube.svg)](https://www.npmjs.com/package/homebridge-platform-maxcube) [![verified-by-homebridge](https://badgen.net/badge/homebridge/verified/purple)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
 Homebridge plugin to bring the eq-3 Max! Cube to Apples HomeKit. Automatically registers all configured devices so that you should instantly be able to control your home heating through Siri & HomeKit.
